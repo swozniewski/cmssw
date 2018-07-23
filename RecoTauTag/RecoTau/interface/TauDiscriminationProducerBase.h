@@ -43,11 +43,12 @@
 
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
+#include "DataFormats/TauReco/interface/PFTauDiscriminatorContainer.h"
 
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/PATTauDiscriminator.h"
 
-template <class TauType, class TauDiscriminator>
+template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType=double>
 class TauDiscriminationProducerBase : public edm::stream::EDProducer<> {
 public:
   // setup framework types for this tautype
@@ -70,7 +71,7 @@ public:
   virtual void beginEvent(const edm::Event&, const edm::EventSetup&) {}
 
   // abstract functions implemented in derived classes.
-  virtual double discriminate(const TauRef& tau) const = 0;
+  virtual TauDiscriminatorDataType discriminate(const TauRef& tau) const = 0;
 
   // called at the end of event processing - override if necessary.
   virtual void endEvent(edm::Event&) {}
@@ -108,6 +109,7 @@ private:
 };
 
 // define our implementations
+typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminatorContainer, reco::PFSingleTauDiscriminatorContainer> PFTauDiscriminationProducerBaseNEW;
 typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminator> PFTauDiscriminationProducerBase;
 typedef TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator> PATTauDiscriminationProducerBase;
 
