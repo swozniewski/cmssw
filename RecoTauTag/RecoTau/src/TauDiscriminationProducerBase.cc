@@ -5,15 +5,15 @@
 using namespace reco;
 
 // default constructor; must not be called
-template <class TauType, class TauDiscriminator>
-TauDiscriminationProducerBase<TauType, TauDiscriminator>::TauDiscriminationProducerBase() {
+template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
+TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::TauDiscriminationProducerBase() {
   throw cms::Exception("TauDiscriminationProducerBase") << " -- default ctor called; derived classes must call "
                                                         << "TauDiscriminationProducerBase(const ParameterSet&)";
 }
 
 //--- standard constructor from PSet
-template <class TauType, class TauDiscriminator>
-TauDiscriminationProducerBase<TauType, TauDiscriminator>::TauDiscriminationProducerBase(const edm::ParameterSet& iConfig)
+template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
+TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::TauDiscriminationProducerBase(const edm::ParameterSet& iConfig)
     : moduleLabel_(iConfig.getParameter<std::string>("@module_label")) {
   // tau collection to discriminate
   TauProducer_ = iConfig.getParameter<edm::InputTag>(getProducerString<TauType>());
@@ -60,8 +60,8 @@ TauDiscriminationProducerBase<TauType, TauDiscriminator>::TauDiscriminationProdu
   produces<TauDiscriminator>();
 }
 
-template <class TauType, class TauDiscriminator>
-void TauDiscriminationProducerBase<TauType, TauDiscriminator>::produce(edm::Event& event,
+template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
+void TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::produce(edm::Event& event,
                                                                        const edm::EventSetup& eventSetup) {
   tauIndex_ = 0;
   // setup function - does nothing in base, but can be overridden to retrieve PV or other stuff
@@ -128,7 +128,7 @@ void TauDiscriminationProducerBase<TauType, TauDiscriminator>::produce(edm::Even
       }
     }
 
-    double result = prediscriminantFailValue_;
+    TauDiscriminatorDataType result = TauDiscriminatorDataType();
     if (passesPrediscriminants) {
       // this tau passes the prereqs, call our implemented discrimination function
       result = discriminate(tauRef);
@@ -178,5 +178,6 @@ std::string getProducerString<pat::Tau>() {
 }
 
 // compile our desired types and make available to linker
+template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminatorContainer, PFSingleTauDiscriminatorContainer>;
 template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminator>;
 template class TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator>;
