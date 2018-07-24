@@ -5,16 +5,16 @@
 using namespace reco;
 
 // default constructor; must not be called
-template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
-TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::TauDiscriminationProducerBase()
+template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType, class ConsumeType>
+TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType, ConsumeType>::TauDiscriminationProducerBase()
 {
    throw cms::Exception("TauDiscriminationProducerBase") << " -- default ctor called; derived classes must call " <<
       "TauDiscriminationProducerBase(const ParameterSet&)";
 }
 
 //--- standard constructor from PSet
-template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
-TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::TauDiscriminationProducerBase(const edm::ParameterSet& iConfig)
+template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType, class ConsumeType>
+TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType, ConsumeType>::TauDiscriminationProducerBase(const edm::ParameterSet& iConfig)
   : moduleLabel_(iConfig.getParameter<std::string>("@module_label"))
 {
    // tau collection to discriminate
@@ -56,7 +56,7 @@ TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataTyp
       TauDiscInfo thisDiscriminator;
       thisDiscriminator.label = label;
       thisDiscriminator.cut   = cut;
-      thisDiscriminator.disc_token = consumes<TauDiscriminator>(label);
+      thisDiscriminator.disc_token = consumes<ConsumeType>(label);
       prediscriminants_.push_back(thisDiscriminator);
    }
 
@@ -66,8 +66,8 @@ TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataTyp
    produces<TauDiscriminator>();
 }
 
-template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType>
-void TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType>::produce(edm::Event& event, const edm::EventSetup& eventSetup)
+template<class TauType, class TauDiscriminator, class TauDiscriminatorDataType, class ConsumeType>
+void TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDataType, ConsumeType>::produce(edm::Event& event, const edm::EventSetup& eventSetup)
 {
    tauIndex_=0;
    // setup function - does nothing in base, but can be overridden to retrieve PV or other stuff
@@ -162,7 +162,7 @@ template<> std::string getProducerString<CaloTau>() { return "CaloTauProducer"; 
 template<> std::string getProducerString<pat::Tau>() { return "PATTauProducer"; }
 
 // compile our desired types and make available to linker
-template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminatorContainer, PFSingleTauDiscriminatorContainer>;
+template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminatorContainer, PFSingleTauDiscriminatorContainer, PFTauDiscriminator>;
 template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminator>;
 template class TauDiscriminationProducerBase<CaloTau, CaloTauDiscriminator>;
 template class TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator>;
