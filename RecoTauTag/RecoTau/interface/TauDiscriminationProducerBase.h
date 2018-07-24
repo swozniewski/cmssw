@@ -48,7 +48,7 @@
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/PATTauDiscriminator.h"
 
-template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType=double>
+template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType=double, class ConsumeType = TauDiscriminator>
 class TauDiscriminationProducerBase : public edm::stream::EDProducer<> {
 public:
   // setup framework types for this tautype
@@ -78,12 +78,12 @@ public:
 
   struct TauDiscInfo {
     edm::InputTag label;
-    edm::Handle<TauDiscriminator> handle;
-    edm::EDGetTokenT<TauDiscriminator> disc_token;
-    // = consumes<TauDiscriminator>(label);
+    edm::Handle<ConsumeType> handle;
+    edm::EDGetTokenT<ConsumeType> disc_token;
+    // = consumes<ConsumeType>(label);
     double cut;
     void fill(const edm::Event& evt) {
-      //	disc_token = consumes<TauDiscriminator>(label);
+      //	disc_token = consumes<ConsumeType>(label);
       evt.getByToken(disc_token, handle);
     };
   };
@@ -109,7 +109,7 @@ private:
 };
 
 // define our implementations
-typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminatorContainer, reco::PFSingleTauDiscriminatorContainer> PFTauDiscriminationProducerBaseNEW;
+typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminatorContainer, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminator> PFTauDiscriminationProducerBaseNEW;
 typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminator> PFTauDiscriminationProducerBase;
 typedef TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator> PATTauDiscriminationProducerBase;
 
