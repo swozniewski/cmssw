@@ -1,7 +1,7 @@
 /*
  * RecoTauDiscriminantCutMultiplexer
  *
- * Author: Evan K. Friis, UW
+ * Authors: Evan K. Friis, UW; Sebastian Wozniewski, KIT
  *
  * Takes two PFTauDiscriminators.
  *
@@ -31,13 +31,13 @@
 #include "TFormula.h"
 #include "TFile.h"
 
-class RecoTauDiscriminantCutMultiplexer : public PFTauDiscriminationProducerBase 
+class RecoTauDiscriminantCutMultiplexer : public PFTauDiscriminationProducerBaseNEW 
 {
  public:
   explicit RecoTauDiscriminantCutMultiplexer(const edm::ParameterSet& pset);
 
   ~RecoTauDiscriminantCutMultiplexer() override;
-  double discriminate(const reco::PFTauRef&) const override;
+  reco::PFSingleTauDiscriminatorContainer discriminate(const reco::PFTauRef&) const override;
   void beginEvent(const edm::Event& event, const edm::EventSetup& eventSetup) override;
   
  private:
@@ -63,7 +63,7 @@ class RecoTauDiscriminantCutMultiplexer : public PFTauDiscriminationProducerBase
     enum { kUndefined, kFixedCut, kVariableCut };
     int mode_;
   };
-  typedef std::map<int, std::unique_ptr<DiscriminantCutEntry>> DiscriminantCutMap;
+  typedef std::map<int, std::vector<std::unique_ptr<DiscriminantCutEntry>>> DiscriminantCutMap;
   DiscriminantCutMap cuts_;
 
   std::string mvaOutputNormalizationName_;
@@ -134,7 +134,7 @@ namespace
 }
 
 RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::ParameterSet& cfg)
-  : PFTauDiscriminationProducerBase(cfg),
+  : PFTauDiscriminationProducerBaseNEW(cfg),
     moduleLabel_(cfg.getParameter<std::string>("@module_label")),
     mvaOutput_normalization_(),
     isInitialized_(false)
@@ -162,24 +162,72 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
 
   // Setup our cut map
   typedef std::vector<edm::ParameterSet> VPSet;
+  typedef std::vector<std::string> VString;
+  typedef std::vector<double> VDouble;
+  //VPSet globalWorkingPoints = cfg.getParameter<VPSet>("workingPoints");
   VPSet mapping = cfg.getParameter<VPSet>("mapping");
   for ( VPSet::const_iterator mappingEntry = mapping.begin();
 	mappingEntry != mapping.end(); ++mappingEntry ) {
     unsigned category = mappingEntry->getParameter<uint32_t>("category");
-    std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};
-    if ( mappingEntry->existsAs<double>("cut") ) {
-      cut->cutValue_ = mappingEntry->getParameter<double>("cut");
-      cut->mode_ = DiscriminantCutEntry::kFixedCut;
-    } else if ( mappingEntry->existsAs<std::string>("cut") ) {
-      cut->cutName_ = mappingEntry->getParameter<std::string>("cut");
-      std::string cutVariable_string = mappingEntry->getParameter<std::string>("variable");
-      cut->cutVariable_.reset( new StringObjectFunction<reco::PFTau>(cutVariable_string) );
-      cut->mode_ = DiscriminantCutEntry::kVariableCut;
+    std::vector<std::unique_ptr<DiscriminantCutEntry>> cutWPs;
+    if ( mappingEntry->existsAs<std::string>("cut") ) {
+      std::string categoryname = mappingEntry->getParameter<std::string>("cut");
+      bool localWPs = false;
+      bool WPsAsDouble = false;
+      if ( mappingEntry->exists("workingPoints") ) {
+          localWPs = true; //workingPoints = mappingEntry->getParameter<VPSet>("workingPoints");
+          if ( mappingEntry->existsAs<VDouble>("workingPoints") ) {
+              WPsAsDouble = true;
+          } else if ( mappingEntry->existsAs<VString>("workingPoints") ) {
+              WPsAsDouble = false;
+          } else {
+              throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
+                  << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
+          }
+      } else if ( cfg.exists("workingPoints") ) {
+          localWPs = false;
+          if ( cfg.existsAs<VDouble>("workingPoints") ) {
+              WPsAsDouble = true;
+          } else if ( cfg.existsAs<VString>("workingPoints") ) {
+              WPsAsDouble = false;
+          } else {
+              throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
+                  << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
+          }
+      } else {
+          throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
+            << " Undefined Configuration Parameter 'workingPoints' !!\n";
+      }
+      if ( WPsAsDouble ){
+        VDouble workingPoints;
+        if ( localWPs ) workingPoints = mappingEntry->getParameter<VDouble>("workingPoints");
+        else cfg.getParameter<VDouble>("workingPoints");
+        for ( VDouble::const_iterator wp = workingPoints.begin();
+            wp != workingPoints.end(); ++wp ) {
+          std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};
+          cut->cutValue_ = *wp;
+          cut->mode_ = DiscriminantCutEntry::kFixedCut;
+          cutWPs.push_back(std::move(cut));
+        }
+      } else {
+        VString workingPoints;
+        if ( localWPs ) workingPoints = mappingEntry->getParameter<VString>("workingPoints");
+        else cfg.getParameter<VString>("workingPoints");
+        for ( VString::const_iterator wp = workingPoints.begin();
+            wp != workingPoints.end(); ++wp ) {
+          std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};  
+          cut->cutName_ = categoryname + *wp;
+          std::string cutVariable_string = mappingEntry->getParameter<std::string>("variable");
+          cut->cutVariable_.reset( new StringObjectFunction<reco::PFTau>(cutVariable_string) );
+          cut->mode_ = DiscriminantCutEntry::kVariableCut;
+          cutWPs.push_back(std::move(cut));
+        }
+      }
     } else {
       throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
         << " Undefined Configuration Parameter 'cut' !!\n";
     }
-    cuts_[category] = std::move(cut);
+    cuts_[category] = std::move(cutWPs);
   }
 
   verbosity_ = ( cfg.exists("verbosity") ) ?
@@ -207,18 +255,21 @@ void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const 
 	mvaOutput_normalization_ = std::move(temp);
       }
     }
-    for ( DiscriminantCutMap::iterator cut = cuts_.begin();
-	  cut != cuts_.end(); ++cut ) {
-      if ( cut->second->mode_ == DiscriminantCutEntry::kVariableCut ) {
-	if ( !loadMVAfromDB_ ) {
-	  if(not inputFile) {
-	    inputFile = openInputFile(inputFileName_);
-	  }
-	  if(verbosity_) std::cout << "Loading from file" << inputFileName_ << std::endl;
-	  cut->second->cutFunction_ = loadObjectFromFile<TGraph>(*inputFile, cut->second->cutName_);
-	} else {
-	  if(verbosity_) std::cout << "Loading from DB" << std::endl;
-	  cut->second->cutFunction_ = loadTGraphFromDB(es, cut->second->cutName_, verbosity_);
+    for ( DiscriminantCutMap::iterator cutWPs = cuts_.begin();
+	  cutWPs != cuts_.end(); ++cutWPs ) {
+      for ( std::vector<std::unique_ptr<DiscriminantCutEntry>>::iterator cut = cutWPs->second.begin();
+          cut != cutWPs->second.end(); ++cut ) {
+          if ( (*cut)->mode_ == DiscriminantCutEntry::kVariableCut ) {
+	  if ( !loadMVAfromDB_ ) {
+	    if(not inputFile) {
+	      inputFile = openInputFile(inputFileName_);
+	    }
+	    if(verbosity_) std::cout << "Loading from file" << inputFileName_ << std::endl;
+	    (*cut)->cutFunction_ = loadObjectFromFile<TGraph>(*inputFile, (*cut)->cutName_);
+	  } else {
+	    if(verbosity_) std::cout << "Loading from DB" << std::endl;
+	    (*cut)->cutFunction_ = loadTGraphFromDB(es, (*cut)->cutName_, verbosity_);
+          }
 	}
       }
     }
@@ -229,7 +280,7 @@ void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const 
   evt.getByToken(key_token, keyHandle_);
 }
 
-double
+reco::PFSingleTauDiscriminatorContainer
 RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
 {
   if ( verbosity_ ) {
@@ -237,10 +288,12 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
     std::cout << " moduleLabel = " << moduleLabel_ << std::endl;
   }
 
+  reco::PFSingleTauDiscriminatorContainer result;
   double disc_result = (*toMultiplexHandle_)[tau];
   if ( verbosity_ ) {
     std::cout << "disc_result = " <<  disc_result << std::endl;
   }
+  result.rawValue = disc_result;
   if ( mvaOutput_normalization_ ) {
     disc_result = mvaOutput_normalization_->Eval(disc_result);
     //if ( disc_result > 1. ) disc_result = 1.;
@@ -250,36 +303,39 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
     }
   }
   double key_result = (*keyHandle_)[tau];
-  DiscriminantCutMap::const_iterator cutIter = cuts_.find(TMath::Nint(key_result));
-
+  DiscriminantCutMap::const_iterator cutWPsIter = cuts_.find(TMath::Nint(key_result));
   
   // Return null if it doesn't exist
-  if ( cutIter == cuts_.end() ) {
-    return prediscriminantFailValue_;
+  if ( cutWPsIter == cuts_.end() ) {
+    result.rawValue = prediscriminantFailValue_;
+    return result;
   }
   // See if the discriminator passes our cuts
-  bool passesCuts = false;
-  if ( cutIter->second->mode_ == DiscriminantCutEntry::kFixedCut ) {
-    passesCuts = (disc_result > cutIter->second->cutValue_);
-    if ( verbosity_ ) {
-      std::cout << "cutValue (fixed) = " << cutIter->second->cutValue_ << " --> passesCuts = " << passesCuts << std::endl;
-    }
-  } else if ( cutIter->second->mode_ == DiscriminantCutEntry::kVariableCut ) {
-    double cutVariable = (*cutIter->second->cutVariable_)(*tau);
-    double xMin, xMax, dummy;
-    cutIter->second->cutFunction_->GetPoint(0, xMin, dummy);
-    cutIter->second->cutFunction_->GetPoint(cutIter->second->cutFunction_->GetN() - 1, xMax, dummy);
-    const double epsilon = 1.e-3;
-    if      ( cutVariable < (xMin + epsilon) ) cutVariable = xMin + epsilon;
-    else if ( cutVariable > (xMax - epsilon) ) cutVariable = xMax - epsilon;
-    double cutValue = cutIter->second->cutFunction_->Eval(cutVariable);
-    passesCuts = (disc_result > cutValue);
-    if ( verbosity_ ) {
-      std::cout << "cutValue (@" << cutVariable << ") = " << cutValue << " --> passesCuts = " << passesCuts << std::endl;
-    }
-  } else assert(0);
-
-  return passesCuts;
+  for ( std::vector<std::unique_ptr<DiscriminantCutEntry>>::const_iterator cutIter = cutWPsIter->second.begin();
+          cutIter != cutWPsIter->second.end(); ++cutIter ) {
+    bool passesCuts = false;
+    if ( (*cutIter)->mode_ == DiscriminantCutEntry::kFixedCut ) {
+      passesCuts = (disc_result > (*cutIter)->cutValue_);
+      if ( verbosity_ ) {
+        std::cout << "cutValue (fixed) = " << (*cutIter)->cutValue_ << " --> passesCuts = " << passesCuts << std::endl;
+      }
+    } else if ( (*cutIter)->mode_ == DiscriminantCutEntry::kVariableCut ) {
+      double cutVariable = (*(*cutIter)->cutVariable_)(*tau);
+      double xMin, xMax, dummy;
+      (*cutIter)->cutFunction_->GetPoint(0, xMin, dummy);
+      (*cutIter)->cutFunction_->GetPoint((*cutIter)->cutFunction_->GetN() - 1, xMax, dummy);
+      const double epsilon = 1.e-3;
+      if      ( cutVariable < (xMin + epsilon) ) cutVariable = xMin + epsilon;
+      else if ( cutVariable > (xMax - epsilon) ) cutVariable = xMax - epsilon;
+      double cutValue = (*cutIter)->cutFunction_->Eval(cutVariable);
+      passesCuts = (disc_result > cutValue);
+      if ( verbosity_ ) {
+        std::cout << "cutValue (@" << cutVariable << ") = " << cutValue << " --> passesCuts = " << passesCuts << std::endl;
+      }
+    } else assert(0);
+    result.workingPoints.push_back(passesCuts);
+  }
+  return result;
 }
 
 DEFINE_FWK_MODULE(RecoTauDiscriminantCutMultiplexer);
