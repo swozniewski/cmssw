@@ -81,7 +81,7 @@ discriminationByIsolationMVArun2v1raw = cms.EDProducer("PFRecoTauDiscriminationB
     srcFootprintCorrection = cms.InputTag('footprintCorrection') 
 )
 
-discriminationByIsolationMVArun2v1VLoose = recoTauDiscriminantCutMultiplexer.clone(
+discriminationByIsolationMVArun2v1 = recoTauDiscriminantCutMultiplexer.clone(
     PFTauProducer = cms.InputTag('pfTauProducer'),    
     Prediscriminants = requireLeadTrack,
     toMultiplex = cms.InputTag('discriminationByIsolationMVArun2v1raw'),
@@ -90,19 +90,18 @@ discriminationByIsolationMVArun2v1VLoose = recoTauDiscriminantCutMultiplexer.clo
     mapping = cms.VPSet(
         cms.PSet(
             category = cms.uint32(0),
-            cut = cms.string("newDMwLTEff80"),
+            cut = cms.string("newDMwLT"),
             variable = cms.string("pt"),
         )
+    ),
+    workingPoints = cms.vstring(
+        "Eff80",
+        "Eff70",
+        "Eff60",
+        "Eff50",
+        "Eff40"
     )
 )
-discriminationByIsolationMVArun2v1Loose = discriminationByIsolationMVArun2v1VLoose.clone()
-discriminationByIsolationMVArun2v1Loose.mapping[0].cut = cms.string("newDMwLTEff70")
-discriminationByIsolationMVArun2v1Medium = discriminationByIsolationMVArun2v1VLoose.clone()
-discriminationByIsolationMVArun2v1Medium.mapping[0].cut = cms.string("newDMwLTEff60")
-discriminationByIsolationMVArun2v1Tight = discriminationByIsolationMVArun2v1VLoose.clone()
-discriminationByIsolationMVArun2v1Tight.mapping[0].cut = cms.string("newDMwLTEff50")
-discriminationByIsolationMVArun2v1VTight = discriminationByIsolationMVArun2v1VLoose.clone()
-discriminationByIsolationMVArun2v1VTight.mapping[0].cut = cms.string("newDMwLTEff40")
 
 mvaIsolation2SeqRun2 = cms.Sequence(
     chargedIsoPtSum
@@ -111,9 +110,5 @@ mvaIsolation2SeqRun2 = cms.Sequence(
    + photonPtSumOutsideSignalCone
    + footprintCorrection
    + discriminationByIsolationMVArun2v1raw
-   + discriminationByIsolationMVArun2v1VLoose
-   + discriminationByIsolationMVArun2v1Loose
-   + discriminationByIsolationMVArun2v1Medium
-   + discriminationByIsolationMVArun2v1Tight
-   + discriminationByIsolationMVArun2v1VTight
+   + discriminationByIsolationMVArun2v1
 )
