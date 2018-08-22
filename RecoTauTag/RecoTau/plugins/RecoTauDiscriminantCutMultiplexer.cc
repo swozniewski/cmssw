@@ -161,7 +161,6 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
   typedef std::vector<edm::ParameterSet> VPSet;
   typedef std::vector<std::string> VString;
   typedef std::vector<double> VDouble;
-  //VPSet globalWorkingPoints = cfg.getParameter<VPSet>("workingPoints");
   VPSet mapping = cfg.getParameter<VPSet>("mapping");
   for ( VPSet::const_iterator mappingEntry = mapping.begin();
 	mappingEntry != mapping.end(); ++mappingEntry ) {
@@ -172,7 +171,7 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
       bool localWPs = false;
       bool WPsAsDouble = false;
       if ( mappingEntry->exists("workingPoints") ) {
-          localWPs = true; //workingPoints = mappingEntry->getParameter<VPSet>("workingPoints");
+          localWPs = true;
           if ( mappingEntry->existsAs<VDouble>("workingPoints") ) {
               WPsAsDouble = true;
           } else if ( mappingEntry->existsAs<VString>("workingPoints") ) {
@@ -198,7 +197,7 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
       if ( WPsAsDouble ){
         VDouble workingPoints;
         if ( localWPs ) workingPoints = mappingEntry->getParameter<VDouble>("workingPoints");
-        else cfg.getParameter<VDouble>("workingPoints");
+        else workingPoints = cfg.getParameter<VDouble>("workingPoints");
         for ( VDouble::const_iterator wp = workingPoints.begin();
             wp != workingPoints.end(); ++wp ) {
           std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};
@@ -209,7 +208,7 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
       } else {
         VString workingPoints;
         if ( localWPs ) workingPoints = mappingEntry->getParameter<VString>("workingPoints");
-        else cfg.getParameter<VString>("workingPoints");
+        else workingPoints = cfg.getParameter<VString>("workingPoints");
         for ( VString::const_iterator wp = workingPoints.begin();
             wp != workingPoints.end(); ++wp ) {
           std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};  
