@@ -604,7 +604,10 @@ float PATTauProducer::getTauIdDiscriminatorFromContainer(const edm::Handle<reco:
 {
   edm::Ref<reco::PFTauCollection> tauRef(tauCollection, tauIdx);
   if (WPIdx == -1) return (*tauIdDiscr)[tauRef].rawValue;
-  else return (*tauIdDiscr)[tauRef].workingPoints[WPIdx];
+  else{
+      if ((*tauIdDiscr)[tauRef].workingPoints.size()==0) return 0.0; //WP vector not filled if prediscriminor in RecoTauDiscriminator failed. Set PAT output to false in this case
+      else return (*tauIdDiscr)[tauRef].workingPoints.at(WPIdx);
+  }
 }
 
 // ParameterSet description for module
