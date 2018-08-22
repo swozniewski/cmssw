@@ -84,7 +84,7 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet& iConfig)
     std::map<std::string, IDContainerData> idContainerMap;
     for (std::vector<std::string>::const_iterator it = names.begin(), ed = names.end(); it != ed; ++it) {
       edm::ParameterSet idp = idps.getParameter<edm::ParameterSet>(*it);
-      int wpidx = idp.getParameter<double>("workingPointIndex");
+      int wpidx = idp.getParameter<int>("workingPointIndex");
       edm::InputTag tag = idp.getParameter<edm::InputTag>("inputTag");
       if (wpidx == -2){
         tauIDSrcs_.push_back(NameTag(*it, tag));
