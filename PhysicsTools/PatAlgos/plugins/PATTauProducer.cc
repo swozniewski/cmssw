@@ -398,10 +398,11 @@ void PATTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
             continue;
           }
           for (size_t j = 0; j < tauIDSrcContainers_[i].size(); ++j) {
-            //std::cout << "filling PFTauDiscriminator '" << tauIDSrcContainers_[i][j].first << "' into pat::Tau object..." << std::endl;
-            ids[i].first = tauIDSrcContainers_[i][j].first;
-            ids[i].second = getTauIdDiscriminatorFromContainer(pfTauCollection, idx, pfTauIdDiscr, tauIDSrcContainers_[i][j].second);
+            //std::cout << "filling PFTauDiscriminator '" << tauIDSrcContainers_[i][j].first << "' into pat::Tau object at index " << numberPlainTauIds + i + j << " ..." << std::endl;
+            ids[numberPlainTauIds + j].first = tauIDSrcContainers_[i][j].first;
+            ids[numberPlainTauIds + j].second = getTauIdDiscriminatorFromContainer(pfTauCollection, idx, pfTauIdDiscr, tauIDSrcContainers_[i][j].second);
           }
+          numberPlainTauIds += tauIDSrcContainers_[i].size();
         }
       } else {
         throw cms::Exception("Type Mismatch") <<
