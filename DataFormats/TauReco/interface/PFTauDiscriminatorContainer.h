@@ -11,6 +11,9 @@ namespace reco {
       double rawValue;
       std::vector<bool> workingPoints;
       operator double() const { return rawValue; }
+      
+      PFSingleTauDiscriminatorContainer(){}
+      PFSingleTauDiscriminatorContainer(double rawInit) : rawValue(rawInit) {}
   };
 
   typedef edm::AssociationVector<PFTauRefProd,std::vector<PFSingleTauDiscriminatorContainer> > PFTauDiscriminatorContainerBase;
