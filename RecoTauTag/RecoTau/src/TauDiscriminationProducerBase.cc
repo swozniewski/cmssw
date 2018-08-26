@@ -128,7 +128,7 @@ void TauDiscriminationProducerBase<TauType, TauDiscriminator, TauDiscriminatorDa
       }
     }
 
-    TauDiscriminatorDataType result = TauDiscriminatorDataType();
+    TauDiscriminatorDataType result = TauDiscriminatorDataType(prediscriminantFailValue_);
     if (passesPrediscriminants) {
       // this tau passes the prereqs, call our implemented discrimination function
       result = discriminate(tauRef);
