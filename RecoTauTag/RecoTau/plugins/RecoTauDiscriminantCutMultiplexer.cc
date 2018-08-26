@@ -290,7 +290,6 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
 
   // Return null if it doesn't exist
   if (cutWPsIter == cuts_.end()) {
-    result.rawValue = prediscriminantFailValue_;
     return result;
   }
   // See if the discriminator passes our cuts
