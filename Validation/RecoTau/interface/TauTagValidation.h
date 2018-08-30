@@ -28,6 +28,7 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
+#include "DataFormats/TauReco/interface/PFTauDiscriminatorContainer.h"
 #include "DataFormats/TauReco/interface/CaloTau.h"
 #include "DataFormats/TauReco/interface/CaloTauDiscriminator.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -111,6 +112,7 @@ private:
   edm::EDGetTokenT<reco::PFTauCollection> tauProducerInputTagToken_;
   edm::EDGetTokenT<reco::VertexCollection> primaryVertexCollectionToken_;
   std::vector <edm::EDGetTokenT<reco::PFTauDiscriminator> > currentDiscriminatorToken_;
+  std::vector <std::pair<edm::EDGetTokenT<reco::PFTauDiscriminatorContainer>, int> > currentDiscriminatorContainerToken_;
   std::string refCollection_;
 
   // In case you need to distinguish the output file
