@@ -158,7 +158,7 @@ def switchMVAtoDB(process):
     process.hpsPFTauDiscriminationByMVA6rawElectronRejection.inputFileName = cms.FileInPath('RecoTauTag/RecoTau/data/gbrDiscriminationAgainstElectronMVA6.root')
 
     process.hpsPFTauDiscriminationByMVA6ElectronRejection.mapping[0].cut = cms.string("")
-    for i, cat in enumerate([0, 2, 5, 7, 8, 10, 13, 15])
+    for i, cat in enumerate([0, 2, 5, 7, 8, 10, 13, 15]):
         process.hpsPFTauDiscriminationByMVA6ElectronRejection.mapping[i].workingPoints = cms.vstring(
             "eff99cat%i"%cat,
             "eff96cat%i"%cat,
