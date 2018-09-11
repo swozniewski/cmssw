@@ -113,7 +113,7 @@ RecoTauPiZeroProducer::RecoTauPiZeroProducer(const edm::ParameterSet& pset)
 
   // now all producers apply a final output selection
   std::string selection = pset.getParameter<std::string>("outputSelection");
-  if (selection != "") {
+  if (!selection.empty()) {
     outputSelector_.reset(
         new StringCutObjectSelector<reco::RecoTauPiZero>(selection));
   }

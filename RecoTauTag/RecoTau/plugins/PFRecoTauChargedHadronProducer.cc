@@ -124,7 +124,7 @@ PFRecoTauChargedHadronProducer::PFRecoTauChargedHadronProducer(const edm::Parame
   
   // check if we want to apply a final output selection
   std::string selection = cfg.getParameter<std::string>("outputSelection");
-  if ( selection != "" ) {
+  if ( !selection.empty() ) {
     outputSelector_.reset(new StringCutObjectSelector<reco::PFRecoTauChargedHadron>(selection));
   }
 
