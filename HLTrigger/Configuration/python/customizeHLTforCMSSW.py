@@ -227,6 +227,12 @@ def customizeHLTForL3OIPR24267(process):
 
 
 
+# RecoTauJetRegionProducer requires new parameter "varbosity"
+def customiseFor24501(process):
+    for producer in producers_by_type(process, "RecoTauJetRegionProducer"):
+        producer.verbosity = cms.int32(0)
+    return process
+
 
 ###For parameter changes in SiStripClusterizerFromRaw for PbPb 2018 data-taking
 def customiseForPR24339HybridFormatSiStripZS(process):
@@ -260,5 +266,6 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
     # process = customizeHLTForL3OIPR24267(process)
 
     process = customiseFor24329(process)
+    process = customiseFor24501(process)
 
     return process
