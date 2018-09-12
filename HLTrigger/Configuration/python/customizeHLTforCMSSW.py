@@ -209,6 +209,12 @@ def customizeHLTForL3OIPR24267(process):
 
 
 
+# RecoTauJetRegionProducer requires new parameter "varbosity"
+def customiseFor24501(process):
+    for producer in producers_by_type(process, "RecoTauJetRegionProducer"):
+        producer.verbosity = cms.int32(0)
+    return process
+
 
 
 # CMSSW version specific customizations
@@ -218,5 +224,6 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
     # process = customiseFor12718(process)
 
     process = customizeHLTForL3OIPR24267(process)
+    process = customiseFor24501(process)
 
     return process
