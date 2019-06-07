@@ -276,7 +276,7 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
   if (verbosity_) {
     std::cout << "disc_result = " << disc_result << std::endl;
   }
-  result.rawValue = disc_result;
+  result.rawValues.push_back(disc_result);
   if (mvaOutput_normalization_) {
     disc_result = mvaOutput_normalization_->Eval(disc_result);
     //if ( disc_result > 1. ) disc_result = 1.;
