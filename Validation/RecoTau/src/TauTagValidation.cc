@@ -618,7 +618,7 @@ void TauTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         }else{
             iEvent.getByToken( currentDiscriminatorContainerToken_[j-currentDiscriminatorToken_.size()].first, currentDiscriminatorContainer );
             if (currentDiscriminatorContainerToken_[j-currentDiscriminatorToken_.size()].second == -1){
-                passesID = ((*currentDiscriminatorContainer)[thePFTau].rawValue >= discriminators_.at(j).getParameter<double>("selectionCut"));
+                passesID = ((*currentDiscriminatorContainer)[thePFTau].rawValues.at(0) >= discriminators_.at(j).getParameter<double>("selectionCut"));
             }else{
                 if((*currentDiscriminatorContainer)[thePFTau].workingPoints.size()==0) passesID = false; //in case of prediscriminant fail at reco level
                 else passesID = (*currentDiscriminatorContainer)[thePFTau].workingPoints.at(currentDiscriminatorContainerToken_[j-currentDiscriminatorToken_.size()].second);

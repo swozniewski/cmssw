@@ -604,7 +604,7 @@ float PATTauProducer::getTauIdDiscriminator(const edm::Handle<TauCollectionType>
 float PATTauProducer::getTauIdDiscriminatorFromContainer(const edm::Handle<reco::PFTauCollection>& tauCollection, size_t tauIdx, const edm::Handle<reco::PFTauDiscriminatorContainer>& tauIdDiscr, int WPIdx)
 {
   edm::Ref<reco::PFTauCollection> tauRef(tauCollection, tauIdx);
-  if (WPIdx == -1) return (*tauIdDiscr)[tauRef].rawValue;
+  if (WPIdx < 0) return (*tauIdDiscr)[tauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
   else{
       if ((*tauIdDiscr)[tauRef].workingPoints.size()==0) return 0.0; //WP vector not filled if prediscriminor in RecoTauDiscriminator failed. Set PAT output to false in this case
       else return (*tauIdDiscr)[tauRef].workingPoints.at(WPIdx);

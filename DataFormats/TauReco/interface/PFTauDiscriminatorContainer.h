@@ -8,12 +8,12 @@
 
 namespace reco {
   struct PFSingleTauDiscriminatorContainer {
-      double rawValue;
+      std::vector<double> rawValues;
       std::vector<bool> workingPoints;
-      operator double() const { return rawValue; }
+      operator double() const { return rawValues.at(0); }
       
       PFSingleTauDiscriminatorContainer(){}
-      PFSingleTauDiscriminatorContainer(double rawInit) : rawValue(rawInit) {}
+      PFSingleTauDiscriminatorContainer(double rawInit){ rawValues.push_back(rawInit); }
   };
 
   typedef edm::AssociationVector<PFTauRefProd,std::vector<PFSingleTauDiscriminatorContainer> > PFTauDiscriminatorContainerBase;
