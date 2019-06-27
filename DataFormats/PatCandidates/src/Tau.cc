@@ -123,8 +123,6 @@ void Tau::initFromBaseTau(const reco::BaseTau& aTau) {
       }
       pfEssential_.push_back(pat::tau::TauPFEssential(*pfTau));
     }
-    const reco::CaloTau * caloTau = dynamic_cast<const reco::CaloTau *>(&aTau);
-    if (caloTau != nullptr) caloSpecific_.push_back(pat::tau::TauCaloSpecific(*caloTau));
 }
 
 /// destructor
@@ -272,16 +270,10 @@ const pat::tau::TauPFEssential & Tau::pfEssential() const {
 }
 
 
-const pat::tau::TauCaloSpecific & Tau::caloSpecific() const {
-  if (!isCaloTau()) throw cms::Exception("Type Error") << "Requesting a CaloTau-specific information from a pat::Tau which wasn't made from a CaloTau.\n";
-  return caloSpecific_[0]; 
-}
-
 reco::Candidate::LorentzVector Tau::p4Jet() const
 {
-  if ( isCaloTau() ) return caloSpecific().p4Jet_;
   if ( isPFTau()   ) return reco::Candidate::LorentzVector(pfEssential().p4Jet_);
-  throw cms::Exception("Type Error") << "Requesting a CaloTau/PFTau-specific information from a pat::Tau which wasn't made from either a CaloTau or a PFTau.\n";
+  throw cms::Exception("Type Error") << "Requesting a PFTau-specific information from a pat::Tau which wasn't made from a PFTau.\n";
 }
 
 float Tau::dxy_Sig() const
@@ -311,23 +303,20 @@ float Tau::ip3d_Sig() const
 
 float Tau::etaetaMoment() const
 {
-  if ( isCaloTau() ) return caloSpecific().etaetaMoment_;
   if ( isPFTau()   ) return pfSpecific().etaetaMoment_;
-  throw cms::Exception("Type Error") << "Requesting a CaloTau/PFTau-specific information from a pat::Tau which wasn't made from either a CaloTau or a PFTau.\n";
+  throw cms::Exception("Type Error") << "Requesting a PFTau-specific information from a pat::Tau which wasn't made from a PFTau.\n";
 }
 
 float Tau::phiphiMoment() const
 {
-  if ( isCaloTau() ) return caloSpecific().phiphiMoment_;
   if ( isPFTau()   ) return pfSpecific().phiphiMoment_;
-  throw cms::Exception("Type Error") << "Requesting a CaloTau/PFTau-specific information from a pat::Tau which wasn't made from either a CaloTau or a PFTau.\n";
+  throw cms::Exception("Type Error") << "Requesting a PFTau-specific information from a pat::Tau which wasn't made from a PFTau.\n";
 }
 
 float Tau::etaphiMoment() const
 {
-  if ( isCaloTau() ) return caloSpecific().etaphiMoment_;
   if ( isPFTau()   ) return pfSpecific().etaphiMoment_;
-  throw cms::Exception("Type Error") << "Requesting a CaloTau/PFTau-specific information from a pat::Tau which wasn't made from either a CaloTau or a PFTau.\n";
+  throw cms::Exception("Type Error") << "Requesting a PFTau-specific information from a pat::Tau which wasn't made from a PFTau.\n";
 }
 
 void Tau::setDecayMode(int decayMode)
