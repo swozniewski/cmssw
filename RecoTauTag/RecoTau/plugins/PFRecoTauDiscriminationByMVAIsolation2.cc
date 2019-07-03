@@ -66,14 +66,13 @@ namespace {
   }
 }  // namespace
 
-class PFRecoTauDiscriminationByIsolationMVA2 : public PFTauDiscriminationProducerBase {
+class PFRecoTauDiscriminationByIsolationMVA2 : public PFTauDiscriminationProducerBaseNEW {
 public:
   explicit PFRecoTauDiscriminationByIsolationMVA2(const edm::ParameterSet& cfg)
-      : PFTauDiscriminationProducerBase(cfg),
+      : PFTauDiscriminationProducerBaseNEW(cfg),
         moduleLabel_(cfg.getParameter<std::string>("@module_label")),
         mvaReader_(nullptr),
-        mvaInput_(nullptr),
-        category_output_() {
+        mvaInput_(nullptr) {
     mvaName_ = cfg.getParameter<std::string>("mvaName");
     loadMVAfromDB_ = cfg.getParameter<bool>("loadMVAfromDB");
     if (!loadMVAfromDB_) {
@@ -107,15 +106,11 @@ public:
     PUcorrPtSum_token = consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("srcPUcorrPtSum"));
 
     verbosity_ = cfg.getParameter<int>("verbosity");
-
-    produces<PFTauDiscriminator>("category");
   }
 
   void beginEvent(const edm::Event&, const edm::EventSetup&) override;
 
-  double discriminate(const PFTauRef&) const override;
-
-  void endEvent(edm::Event&) override;
+  reco::PFSingleTauDiscriminatorContainer discriminate(const PFTauRef&) const override;
 
   ~PFRecoTauDiscriminationByIsolationMVA2() override {
     if (!loadMVAfromDB_)
@@ -152,7 +147,6 @@ private:
   edm::Handle<reco::PFTauDiscriminator> puCorrPtSums_;
 
   edm::Handle<TauCollection> taus_;
-  std::unique_ptr<PFTauDiscriminator> category_output_;
 
   std::vector<TFile*> inputFilesToDelete_;
 
@@ -175,13 +169,11 @@ void PFRecoTauDiscriminationByIsolationMVA2::beginEvent(const edm::Event& evt, c
   evt.getByToken(PUcorrPtSum_token, puCorrPtSums_);
 
   evt.getByToken(Tau_token, taus_);
-  category_output_.reset(new PFTauDiscriminator(TauRefProd(taus_)));
 }
 
-double PFRecoTauDiscriminationByIsolationMVA2::discriminate(const PFTauRef& tau) const {
-  // CV: define dummy category index in order to use RecoTauDiscriminantCutMultiplexer module to appy WP cuts
-  double category = 0.;
-  category_output_->setValue(tauIndex_, category);
+reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolationMVA2::discriminate(const PFTauRef& tau) const {
+  reco::PFSingleTauDiscriminatorContainer result;
+  result.rawValues = {-1.,0.}; // CV: define dummy category index in order to use RecoTauDiscriminantCutMultiplexer module to apply WP cuts
 
   // CV: computation of MVA value requires presence of leading charged hadron
   if (tau->leadChargedHadrCand().isNull())
@@ -241,15 +233,9 @@ double PFRecoTauDiscriminationByIsolationMVA2::discriminate(const PFTauRef& tau)
           << " distance = " << decayDistMag << ", significance = " << tauLifetimeInfo.flightLengthSig();
       edm::LogPrint("PFTauDiscByMVAIsol2") << "--> mvaValue = " << mvaValue;
     }
-    return mvaValue;
-  } else {
-    return -1.;
+    result.rawValues.at(0) = mvaValue;
   }
-}
-
-void PFRecoTauDiscriminationByIsolationMVA2::endEvent(edm::Event& evt) {
-  // add all category indices to event
-  evt.put(std::move(category_output_), "category");
+  return result;
 }
 
 void PFRecoTauDiscriminationByIsolationMVA2::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
