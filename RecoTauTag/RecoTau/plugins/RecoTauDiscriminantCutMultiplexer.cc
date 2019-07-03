@@ -3,7 +3,7 @@
  *
  * Authors: Evan K. Friis, UW; Sebastian Wozniewski, KIT
  *
- * Takes two PFTauDiscriminators.
+ * Takes a PFTauDiscriminatorContainer with two raw values: The toMultiplex diescriminator is expected at rawValues[0] and the key (needed by certain discriminators) is expected at rawValues[1].
  *
  * The "key" discriminantor is rounded to the nearest integer.
  *
@@ -69,11 +69,8 @@ private:
   bool isInitialized_;
 
   edm::InputTag toMultiplex_;
-  edm::InputTag key_;
-  edm::Handle<reco::PFTauDiscriminator> toMultiplexHandle_;
-  edm::Handle<reco::PFTauDiscriminator> keyHandle_;
-  edm::EDGetTokenT<reco::PFTauDiscriminator> toMultiplex_token;
-  edm::EDGetTokenT<reco::PFTauDiscriminator> key_token;
+  edm::Handle<reco::PFTauDiscriminatorContainer> toMultiplexHandle_;
+  edm::EDGetTokenT<reco::PFTauDiscriminatorContainer> toMultiplex_token;
 
   int verbosity_;
 };
@@ -136,9 +133,7 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
       mvaOutput_normalization_(),
       isInitialized_(false) {
   toMultiplex_ = cfg.getParameter<edm::InputTag>("toMultiplex");
-  toMultiplex_token = consumes<reco::PFTauDiscriminator>(toMultiplex_);
-  key_ = cfg.getParameter<edm::InputTag>("key");
-  key_token = consumes<reco::PFTauDiscriminator>(key_);
+  toMultiplex_token = consumes<reco::PFTauDiscriminatorContainer>(toMultiplex_);
 
   verbosity_ = cfg.getParameter<int>("verbosity");
 
@@ -260,7 +255,6 @@ void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const 
   }
 
   evt.getByToken(toMultiplex_token, toMultiplexHandle_);
-  evt.getByToken(key_token, keyHandle_);
 }
 
 reco::PFSingleTauDiscriminatorContainer
@@ -272,7 +266,7 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
   }
 
   reco::PFSingleTauDiscriminatorContainer result;
-  double disc_result = (*toMultiplexHandle_)[tau];
+  double disc_result = (*toMultiplexHandle_)[tau].rawValues.at(0);
   if (verbosity_) {
     std::cout << "disc_result = " << disc_result << std::endl;
   }
@@ -285,7 +279,11 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
       std::cout << "disc_result (normalized) = " << disc_result << std::endl;
     }
   }
-  double key_result = (*keyHandle_)[tau];
+  if ((*toMultiplexHandle_)[tau].rawValues.size()<2) {
+      throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
+        << " Input discriminator is expected to have a second component defining the event category!";
+  }
+  double key_result = (*toMultiplexHandle_)[tau].rawValues.at(1);
   DiscriminantCutMap::const_iterator cutWPsIter = cuts_.find(TMath::Nint(key_result));
 
   // Return null if it doesn't exist
@@ -347,7 +345,6 @@ void RecoTauDiscriminantCutMultiplexer::fillDescriptions(edm::ConfigurationDescr
   desc.add<bool>("loadMVAfromDB", true);
   fillProducerDescriptions(desc);  // inherited from the base
   desc.add<std::string>("mvaOutput_normalization", "");
-  desc.add<edm::InputTag>("key", edm::InputTag("fixme"));
   descriptions.add("recoTauDiscriminantCutMultiplexerDefault", desc);
 }
 
