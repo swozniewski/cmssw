@@ -320,7 +320,6 @@ hpsPFTauDiscriminationByMVA6ElectronRejection = recoTauDiscriminantCutMultiplexe
     PFTauProducer = cms.InputTag('hpsPFTauProducer'),
     Prediscriminants = requireDecayMode.clone(),
     toMultiplex = cms.InputTag('hpsPFTauDiscriminationByMVA6rawElectronRejection'),
-    key = cms.InputTag('hpsPFTauDiscriminationByMVA6rawElectronRejection:category'),
     loadMVAfromDB = cms.bool(True),
     mapping = cms.VPSet(
         cms.PSet(
