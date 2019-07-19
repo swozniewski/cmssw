@@ -180,4 +180,5 @@ std::string getProducerString<pat::Tau>() {
 // compile our desired types and make available to linker
 template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminatorContainer, PFSingleTauDiscriminatorContainer, PFTauDiscriminator>;
 template class TauDiscriminationProducerBase<PFTau, PFTauDiscriminator>;
+template class TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminatorContainer, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminator>;
 template class TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator>;

@@ -47,6 +47,7 @@
 
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/PATTauDiscriminator.h"
+#include "DataFormats/PatCandidates/interface/PATTauDiscriminatorContainer.h"
 
 template <class TauType, class TauDiscriminator, class TauDiscriminatorDataType=double, class ConsumeType = TauDiscriminator>
 class TauDiscriminationProducerBase : public edm::stream::EDProducer<> {
@@ -111,6 +112,7 @@ private:
 // define our implementations
 typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminatorContainer, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminator> PFTauDiscriminationProducerBaseNEW;
 typedef TauDiscriminationProducerBase<reco::PFTau, reco::PFTauDiscriminator> PFTauDiscriminationProducerBase;
+typedef TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminatorContainer, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminator> PATTauDiscriminationProducerBaseNEW;
 typedef TauDiscriminationProducerBase<pat::Tau, pat::PATTauDiscriminator> PATTauDiscriminationProducerBase;
 
 /// helper function retrieve the correct cfi getter string (ie PFTauProducer)
