@@ -1,5 +1,5 @@
 /*
- * RecoTauDiscriminantCutMultiplexer
+ * TauDiscriminantCutMultiplexerBase
  *
  * Authors: Evan K. Friis, UW; Sebastian Wozniewski, KIT
  *
@@ -34,12 +34,13 @@
 #include "TFormula.h"
 #include "TFile.h"
 
-class RecoTauDiscriminantCutMultiplexer : public PFTauDiscriminationProducerBaseNEW {
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+class TauDiscriminantCutMultiplexerBase : public ParentClass {
 public:
-  explicit RecoTauDiscriminantCutMultiplexer(const edm::ParameterSet& pset);
+  explicit TauDiscriminantCutMultiplexerBase(const edm::ParameterSet& pset);
 
-  ~RecoTauDiscriminantCutMultiplexer() override;
-  reco::PFSingleTauDiscriminatorContainer discriminate(const reco::PFTauRef&) const override;
+  ~TauDiscriminantCutMultiplexerBase() override;
+  TauDiscriminatorValueType discriminate(const TauTypeRef&) const override;
   void beginEvent(const edm::Event& event, const edm::EventSetup& eventSetup) override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
@@ -55,7 +56,7 @@ private:
     ~DiscriminantCutEntry() {}
     double cutValue_;
     std::string cutName_;
-    std::unique_ptr<StringObjectFunction<reco::PFTau>> cutVariable_;
+    std::unique_ptr<StringObjectFunction<TauType>> cutVariable_;
     std::unique_ptr<const TGraph> cutFunction_;
     enum { kUndefined, kFixedCut, kVariableCut };
     int mode_;
@@ -69,8 +70,8 @@ private:
   bool isInitialized_;
 
   edm::InputTag toMultiplex_;
-  edm::Handle<reco::PFTauDiscriminatorContainer> toMultiplexHandle_;
-  edm::EDGetTokenT<reco::PFTauDiscriminatorContainer> toMultiplex_token;
+  edm::Handle<TauDiscriminator> toMultiplexHandle_;
+  edm::EDGetTokenT<TauDiscriminator> toMultiplex_token;
 
   int verbosity_;
 };
@@ -78,7 +79,7 @@ private:
 namespace {
   std::unique_ptr<TFile> openInputFile(const edm::FileInPath& inputFileName) {
     if (inputFileName.location() == edm::FileInPath::Unknown) {
-      throw cms::Exception("RecoTauDiscriminantCutMultiplexer::loadObjectFromFile")
+      throw cms::Exception("TauDiscriminantCutMultiplexerBase::loadObjectFromFile")
           << " Failed to find File = " << inputFileName << " !!\n";
     }
     return std::unique_ptr<TFile>{new TFile(inputFileName.fullPath().data())};
@@ -88,7 +89,7 @@ namespace {
   std::unique_ptr<const T> loadObjectFromFile(TFile& inputFile, const std::string& objectName) {
     const T* object = dynamic_cast<T*>(inputFile.Get(objectName.data()));
     if (!object)
-      throw cms::Exception("RecoTauDiscriminantCutMultiplexer::loadObjectFromFile")
+      throw cms::Exception("TauDiscriminantCutMultiplexerBase::loadObjectFromFile")
           << " Failed to load Object = " << objectName.data() << " from file = " << inputFile.GetName() << " !!\n";
     //Need to use TObject::Clone since the type T might be a base class
     return std::unique_ptr<const T>{static_cast<T*>(object->Clone())};
@@ -120,20 +121,21 @@ namespace {
     if (formulaPayload->formulas().size() == 1 && formulaPayload->limits().size() == 1) {
       return std::unique_ptr<TFormula>{new TFormula(newName, formulaPayload->formulas().at(0).data())};
     } else {
-      throw cms::Exception("RecoTauDiscriminantCutMultiplexer::loadTFormulaFromDB")
+      throw cms::Exception("TauDiscriminantCutMultiplexerBase::loadTFormulaFromDB")
           << "Failed to load TFormula = " << formulaName << " from Database !!\n";
     }
     return std::unique_ptr<TFormula>{};
   }
 }  // namespace
 
-RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::ParameterSet& cfg)
-    : PFTauDiscriminationProducerBaseNEW(cfg),
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValueType, TauDiscriminator, ParentClass>::TauDiscriminantCutMultiplexerBase(const edm::ParameterSet& cfg)
+    : ParentClass(cfg),
       moduleLabel_(cfg.getParameter<std::string>("@module_label")),
       mvaOutput_normalization_(),
       isInitialized_(false) {
   toMultiplex_ = cfg.getParameter<edm::InputTag>("toMultiplex");
-  toMultiplex_token = consumes<reco::PFTauDiscriminatorContainer>(toMultiplex_);
+  toMultiplex_token = this->template consumes<TauDiscriminator>(toMultiplex_);
 
   verbosity_ = cfg.getParameter<int>("verbosity");
 
@@ -164,7 +166,7 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
           } else if (mappingEntry->existsAs<VString>("workingPoints")) {
               WPsAsDouble = false;
           } else {
-              throw cms::Exception("RecoTauDiscriminantCutMultiplexer")  << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
+              throw cms::Exception("TauDiscriminantCutMultiplexerBase")  << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
           }
       } else if (cfg.exists("workingPoints")) {
           localWPs = false;
@@ -173,10 +175,10 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
           } else if (cfg.existsAs<VString>("workingPoints")) {
               WPsAsDouble = false;
           } else {
-              throw cms::Exception("RecoTauDiscriminantCutMultiplexer") << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
+              throw cms::Exception("TauDiscriminantCutMultiplexerBase") << " Configuration Parameter 'workingPoints' must be filled with cms.String or cms.Double!!\n";
           }
       } else {
-          throw cms::Exception("RecoTauDiscriminantCutMultiplexer") << " Undefined Configuration Parameter 'workingPoints' !!\n";
+          throw cms::Exception("TauDiscriminantCutMultiplexerBase") << " Undefined Configuration Parameter 'workingPoints' !!\n";
       }
       if (WPsAsDouble){
         VDouble workingPoints;
@@ -198,13 +200,13 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
           std::unique_ptr<DiscriminantCutEntry> cut{new DiscriminantCutEntry()};  
           cut->cutName_ = categoryname + *wp;
           std::string cutVariable_string = mappingEntry->getParameter<std::string>("variable");
-          cut->cutVariable_.reset( new StringObjectFunction<reco::PFTau>(cutVariable_string) );
+          cut->cutVariable_.reset( new StringObjectFunction<TauType>(cutVariable_string) );
           cut->mode_ = DiscriminantCutEntry::kVariableCut;
           cutWPs.push_back(std::move(cut));
         }
       }
     } else {
-      throw cms::Exception("RecoTauDiscriminantCutMultiplexer") << " Undefined Configuration Parameter 'cut' !!\n";
+      throw cms::Exception("TauDiscriminantCutMultiplexerBase") << " Undefined Configuration Parameter 'cut' !!\n";
     }
     cuts_[category] = std::move(cutWPs);
   }
@@ -214,9 +216,11 @@ RecoTauDiscriminantCutMultiplexer::RecoTauDiscriminantCutMultiplexer(const edm::
     std::cout << "constructed " << moduleLabel_ << std::endl;
 }
 
-RecoTauDiscriminantCutMultiplexer::~RecoTauDiscriminantCutMultiplexer() {}
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValueType, TauDiscriminator, ParentClass>::~TauDiscriminantCutMultiplexerBase() {}
 
-void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const edm::EventSetup& es) {
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+void TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValueType, TauDiscriminator, ParentClass>::beginEvent(const edm::Event& evt, const edm::EventSetup& es) {
   if (verbosity_)
     std::cout << " begin! " << moduleLabel_ << " " << isInitialized_ << std::endl;
   if (!isInitialized_) {
@@ -233,8 +237,8 @@ void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const 
         mvaOutput_normalization_ = std::move(temp);
       }
     }
-    for (DiscriminantCutMap::iterator cutWPs = cuts_.begin(); cutWPs != cuts_.end(); ++cutWPs) {
-      for (std::vector<std::unique_ptr<DiscriminantCutEntry>>::iterator cut = cutWPs->second.begin(); cut != cutWPs->second.end(); ++cut) {
+    for (typename DiscriminantCutMap::iterator cutWPs = cuts_.begin(); cutWPs != cuts_.end(); ++cutWPs) {
+      for (typename std::vector<std::unique_ptr<DiscriminantCutEntry>>::iterator cut = cutWPs->second.begin(); cut != cutWPs->second.end(); ++cut) {
         if ((*cut)->mode_ == DiscriminantCutEntry::kVariableCut) {
           if (!loadMVAfromDB_) {
             if(not inputFile) {
@@ -257,15 +261,15 @@ void RecoTauDiscriminantCutMultiplexer::beginEvent(const edm::Event& evt, const 
   evt.getByToken(toMultiplex_token, toMultiplexHandle_);
 }
 
-reco::PFSingleTauDiscriminatorContainer
-RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+TauDiscriminatorValueType TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValueType, TauDiscriminator, ParentClass>::discriminate(const TauTypeRef& tau) const
 {
   if (verbosity_) {
-    std::cout << "<RecoTauDiscriminantCutMultiplexer::discriminate>:" << std::endl;
+    std::cout << "<TauDiscriminantCutMultiplexerBase::discriminate>:" << std::endl;
     std::cout << " moduleLabel = " << moduleLabel_ << std::endl;
   }
 
-  reco::PFSingleTauDiscriminatorContainer result;
+  TauDiscriminatorValueType result;
   double disc_result = (*toMultiplexHandle_)[tau].rawValues.at(0);
   if (verbosity_) {
     std::cout << "disc_result = " << disc_result << std::endl;
@@ -280,18 +284,18 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
     }
   }
   if ((*toMultiplexHandle_)[tau].rawValues.size()<2) {
-      throw cms::Exception("RecoTauDiscriminantCutMultiplexer") 
+      throw cms::Exception("TauDiscriminantCutMultiplexerBase") 
         << " Input discriminator is expected to have a second component defining the event category!";
   }
   double key_result = (*toMultiplexHandle_)[tau].rawValues.at(1);
-  DiscriminantCutMap::const_iterator cutWPsIter = cuts_.find(TMath::Nint(key_result));
+  typename DiscriminantCutMap::const_iterator cutWPsIter = cuts_.find(TMath::Nint(key_result));
 
   // Return null if it doesn't exist
   if (cutWPsIter == cuts_.end()) {
     return result;
   }
   // See if the discriminator passes our cuts
-  for (std::vector<std::unique_ptr<DiscriminantCutEntry>>::const_iterator cutIter = cutWPsIter->second.begin();
+  for (typename std::vector<std::unique_ptr<DiscriminantCutEntry>>::const_iterator cutIter = cutWPsIter->second.begin();
           cutIter != cutWPsIter->second.end(); ++cutIter) {
     bool passesCuts = false;
     if ((*cutIter)->mode_ == DiscriminantCutEntry::kFixedCut) {
@@ -318,7 +322,26 @@ RecoTauDiscriminantCutMultiplexer::discriminate(const reco::PFTauRef& tau) const
   return result;
 }
 
-void RecoTauDiscriminantCutMultiplexer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+// template specialization to get the correct default config names in the following fillDescriptions
+template <class TauType>
+std::string getDefaultConfigString() {
+  // this generic one shoudl never be called.
+  // these are specialized in TauDiscriminationProducerBase.cc
+  throw cms::Exception("TauDiscriminantCutMultiplexerBase")
+      << "Unsupported TauType used. You must use either PFTau or PATTau.";
+}
+
+template <>
+std::string getDefaultConfigString<reco::PFTau>(){
+  return "recoTauDiscriminantCutMultiplexerDefault";
+}
+template <>
+std::string getDefaultConfigString<pat::Tau>(){
+  return "PATTauDiscriminantCutMultiplexerDefault";
+}
+
+template <class TauType, class TauTypeRef, class TauDiscriminatorValueType, class TauDiscriminator, class ParentClass>
+void TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValueType, TauDiscriminator, ParentClass>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   // recoTauDiscriminantCutMultiplexer
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("toMultiplex", edm::InputTag("fixme"));
@@ -343,9 +366,18 @@ void RecoTauDiscriminantCutMultiplexer::fillDescriptions(edm::ConfigurationDescr
 
   desc.add<edm::FileInPath>("inputFileName", edm::FileInPath("RecoTauTag/RecoTau/data/emptyMVAinputFile"));
   desc.add<bool>("loadMVAfromDB", true);
-  fillProducerDescriptions(desc);  // inherited from the base
+  ParentClass::fillProducerDescriptions(desc);  // inherited from the base
   desc.add<std::string>("mvaOutput_normalization", "");
-  descriptions.add("recoTauDiscriminantCutMultiplexerDefault", desc);
+  descriptions.add(getDefaultConfigString<TauType>(), desc);
 }
 
+// compile our desired types and make available to linker
+template class TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseNEW>;
+template class TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseNEW>;
+
+// define our implementations
+typedef TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseNEW> RecoTauDiscriminantCutMultiplexer;
+typedef TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseNEW> PATTauDiscriminantCutMultiplexer;
+
 DEFINE_FWK_MODULE(RecoTauDiscriminantCutMultiplexer);
+DEFINE_FWK_MODULE(PATTauDiscriminantCutMultiplexer);
