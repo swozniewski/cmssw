@@ -165,7 +165,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationAgainstElectronMV
             }
           }
 
-          result.rawValues.at(0) = std::min(result.rawValues.at(0), mva_match);
+          result.rawValues.at(0) = std::min(result.rawValues.at(0), float(mva_match));
           isGsfElectronMatched = true;
         }  // deltaR < 0.3
       }    // electron pt > 10
