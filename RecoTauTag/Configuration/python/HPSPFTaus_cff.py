@@ -64,122 +64,38 @@ requireDecayMode = cms.PSet(
         cut = cms.double(0.5)
     )
 )
-## ByLooseIsolation
-hpsPFTauDiscriminationByLooseIsolation = pfRecoTauDiscriminationByIsolation.clone(
+
+## ByLooseChargedIsolation
+hpsPFTauDiscriminationByLooseChargedIsolation = pfRecoTauDiscriminationByIsolation.clone(
     PFTauProducer = cms.InputTag("hpsPFTauProducer"),
     Prediscriminants = requireDecayMode.clone(),
-    ApplyDiscriminationByTrackerIsolation = False,
-    ApplyDiscriminationByECALIsolation = True,
-    applyOccupancyCut = True
-)
-hpsPFTauDiscriminationByLooseIsolation.Prediscriminants.preIso = cms.PSet(
-    Producer = cms.InputTag("hpsPFTauDiscriminationByLooseChargedIsolation"),
-    cut = cms.double(0.5)
-)
-## ByMediumIsolation
-hpsPFTauDiscriminationByMediumIsolation = hpsPFTauDiscriminationByLooseIsolation.clone()
-hpsPFTauDiscriminationByMediumIsolation.qualityCuts.isolationQualityCuts.minTrackPt = 0.8
-hpsPFTauDiscriminationByMediumIsolation.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
-hpsPFTauDiscriminationByMediumIsolation.Prediscriminants.preIso.Producer = cms.InputTag("hpsPFTauDiscriminationByMediumChargedIsolation")
-## ByTightIsolation
-hpsPFTauDiscriminationByTightIsolation = hpsPFTauDiscriminationByLooseIsolation.clone()
-hpsPFTauDiscriminationByTightIsolation.qualityCuts.isolationQualityCuts.minTrackPt = 0.5
-hpsPFTauDiscriminationByTightIsolation.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
-hpsPFTauDiscriminationByTightIsolation.Prediscriminants.preIso.Producer = cms.InputTag("hpsPFTauDiscriminationByTightChargedIsolation")
-## ByLooseIsolationDBSumPtCorr
-hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr = hpsPFTauDiscriminationByLooseIsolation.clone(
-    deltaBetaPUTrackPtCutOverride     = True, # Set the boolean = True to override.
-    deltaBetaPUTrackPtCutOverride_val = 0.5,  # Set the value for new value.
-    applyDeltaBetaCorrection = True,
-    isoConeSizeForDeltaBeta = 0.8,
-    deltaBetaFactor = "%0.4f"%(0.0123/0.1687),
-    applyOccupancyCut = False,
-    applySumPtCut = True,
-)
-hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr.maximumSumPtCut = hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt
-## ByMediumIsolationDBSumPtCorr
-hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr = hpsPFTauDiscriminationByMediumIsolation.clone(
-    deltaBetaPUTrackPtCutOverride     = True, # Set the boolean = True to override.
-    deltaBetaPUTrackPtCutOverride_val = 0.5,  # Set the value for new value.
-    applyDeltaBetaCorrection = True,
-    isoConeSizeForDeltaBeta = 0.8,
-    deltaBetaFactor = "%0.4f"%(0.0462/0.1687),
-    applyOccupancyCut = False,
-    applySumPtCut = True,
-)
-hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr.maximumSumPtCut = hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt
-## ByTightIsolationDBSumPtCorr
-hpsPFTauDiscriminationByTightIsolationDBSumPtCorr = hpsPFTauDiscriminationByTightIsolation.clone(
-    deltaBetaPUTrackPtCutOverride     = True, # Set the boolean = True to override.
-    deltaBetaPUTrackPtCutOverride_val = 0.5,  # Set the value for new value.
-    applyDeltaBetaCorrection = True,
-    isoConeSizeForDeltaBeta = 0.8,
-    deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
-    applyOccupancyCut = False,
-    applySumPtCut = True,
-)
-hpsPFTauDiscriminationByTightIsolationDBSumPtCorr.maximumSumPtCut = hpsPFTauDiscriminationByTightIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt
-## ByLooseCombinedIsolationDBSumPtCorr
-hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr = hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr.clone(
     ApplyDiscriminationByTrackerIsolation = True,
-    ApplyDiscriminationByECALIsolation = True,
-    deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
+    ApplyDiscriminationByECALIsolation = False,
     applyOccupancyCut = False,
+    deltaBetaPUTrackPtCutOverride     = True, # Set the boolean = True to override.
+    deltaBetaPUTrackPtCutOverride_val = 0.5,  # Set the value for new value.
+    applyDeltaBetaCorrection = True,
+    isoConeSizeForDeltaBeta = 0.8,
+    deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
     applySumPtCut = True,
     maximumSumPtCut = 2.5,
-    Prediscriminants = requireDecayMode.clone()
 )
-hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minTrackPt = 0.5
-phase2_common.toModify(hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr.qualityCuts,
+hpsPFTauDiscriminationByLooseChargedIsolation.qualityCuts.isolationQualityCuts.minTrackPt = 0.5
+phase2_common.toModify(hpsPFTauDiscriminationByLooseChargedIsolation.qualityCuts,
                        isolationQualityCuts = dict( minTrackPt = 0.8 )
                       )
-hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
-## ByMediumCombinedIsolationDBSumPtCorr
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr = hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr.clone(
-    ApplyDiscriminationByTrackerIsolation = True,
-    ApplyDiscriminationByECALIsolation = True,
-    deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
-    applyOccupancyCut = False,
-    applySumPtCut = True,
-    maximumSumPtCut = 1.5,
-    Prediscriminants = requireDecayMode.clone()
-)
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minTrackPt = 0.5
-phase2_common.toModify(hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr.qualityCuts,
-                       isolationQualityCuts = dict( minTrackPt = 0.8 )
-                      )
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
-## ByTightCombinedIsolationDBSumPtCorr
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr = hpsPFTauDiscriminationByTightIsolationDBSumPtCorr.clone(
-    ApplyDiscriminationByTrackerIsolation = True,
-    ApplyDiscriminationByECALIsolation = True,
-    deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
-    applyOccupancyCut = False,
-    applySumPtCut = True,
-    maximumSumPtCut = 0.8,
-    Prediscriminants = requireDecayMode.clone()
-)
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minTrackPt = 0.5
-phase2_common.toModify(hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr.qualityCuts,
-                       isolationQualityCuts = dict( minTrackPt = 0.8 )
-                      )
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
-## ByLooseChargedIsolation
-hpsPFTauDiscriminationByLooseChargedIsolation = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr.clone(
-    ApplyDiscriminationByECALIsolation = False
-)
+hpsPFTauDiscriminationByLooseChargedIsolation.qualityCuts.isolationQualityCuts.minGammaEt = 1.0
 ## ByLooseCombinedIsolationDBSumPtCorr3Hits
-hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr.clone()
+hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByLooseChargedIsolation.clone()
+hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.ApplyDiscriminationByECALIsolation = cms.bool(True)
 hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.qualityCuts.isolationQualityCuts.minTrackHits = cms.uint32(3)
 hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.applyPhotonPtSumOutsideSignalConeCut = cms.bool(True)
 ## ByMediumCombinedIsolationDBSumPtCorr3Hits
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr.clone()
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits.qualityCuts.isolationQualityCuts.minTrackHits = cms.uint32(3)
-hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits.applyPhotonPtSumOutsideSignalConeCut = cms.bool(True)
+hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.clone()
+hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits.maximumSumPtCut = cms.double(1.5)
 ## ByTightCombinedIsolationDBSumPtCorr3Hits
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr.clone()
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits.qualityCuts.isolationQualityCuts.minTrackHits = cms.uint32(3)
-hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits.applyPhotonPtSumOutsideSignalConeCut = cms.bool(True)
+hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.clone()
+hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits.maximumSumPtCut = cms.double(0.8)
 ## ByRawCombinedIsolationDBSumPtCorr3Hits
 hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr3Hits = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.clone(
     applySumPtCut = False,
@@ -216,49 +132,21 @@ hpsPFTauDiscriminationByCombinedIsolationDBSumPtCorr3HitsdR03Task = cms.Task(
 hpsPFTauDiscriminationByCombinedIsolationSeqDBSumPtCorr3HitsdR03 = cms.Sequence(
     hpsPFTauDiscriminationByCombinedIsolationDBSumPtCorr3HitsdR03Task
 )
-## ByLoosePileupWeightedIsolation3Hits (kept for Validation)
-hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.clone(
+## hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone
+hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone = hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits.clone(
     ApplyDiscriminationByECALIsolation = cms.bool(False),
     applyDeltaBetaCorrection = cms.bool(False),
     ApplyDiscriminationByWeightedECALIsolation = cms.bool(True),
     UseAllPFCandsForWeights = cms.bool(True),
     applyFootprintCorrection = cms.bool(True),
-    applyPhotonPtSumOutsideSignalConeCut = cms.bool(True)    
-)
-## ByMediumPileupWeightedIsolation3Hits (kept for Validation)
-hpsPFTauDiscriminationByMediumPileupWeightedIsolation3Hits = hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits.clone(
-    maximumSumPtCut = hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits.maximumSumPtCut
-)
-## ByTightPileupWeightedIsolation3Hits (kept for Validation)
-hpsPFTauDiscriminationByTightPileupWeightedIsolation3Hits = hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits.clone(
-    maximumSumPtCut = hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits.maximumSumPtCut
-)
-## ByRawPileupWeightedIsolation3Hits (kept for Validation)
-hpsPFTauDiscriminationByRawPileupWeightedIsolation3Hits = hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits.clone(
-    Prediscriminants = cms.PSet(
-        BooleanOperator = cms.string("and"),
-        decayMode = cms.PSet(
-            Producer = cms.InputTag('hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone'),
-            cut = cms.double(0.5)
-        )
-    ),
-    applySumPtCut = cms.bool(False),
-    storeRawSumPt = cms.bool(True)
-)
-## hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone
-hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone = hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits.clone(
+    applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
     applySumPtCut = cms.bool(False)
 )
-## hpsPFTauDiscriminationByPileupWeightedIsolationSeq3Hits
-hpsPFTauDiscriminationByPileupWeightedIsolation3HitsTask = cms.Task(
-   hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits,
-   hpsPFTauDiscriminationByMediumPileupWeightedIsolation3Hits,
-   hpsPFTauDiscriminationByTightPileupWeightedIsolation3Hits,
-   hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone,
-   hpsPFTauDiscriminationByRawPileupWeightedIsolation3Hits
+hpsPFTauDiscriminationByPhotonPtSumOutsideSignalConeTask = cms.Task(
+   hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone
 )
-hpsPFTauDiscriminationByPileupWeightedIsolationSeq3Hits = cms.Sequence(
-    hpsPFTauDiscriminationByPileupWeightedIsolation3HitsTask
+hpsPFTauDiscriminationByPhotonPtSumOutsideSignalConeSeq = cms.Sequence(
+    hpsPFTauDiscriminationByPhotonPtSumOutsideSignalConeTask
 )
 
 
@@ -703,7 +591,7 @@ produceAndDiscriminateHPSPFTausTask = cms.Task(
     hpsPFTauDiscriminationByLooseIsolation,
     hpsPFTauDiscriminationByCombinedIsolationDBSumPtCorr3HitsTask,
     hpsPFTauDiscriminationByCombinedIsolationDBSumPtCorr3HitsdR03Task,
-    hpsPFTauDiscriminationByPileupWeightedIsolation3HitsTask,
+    hpsPFTauDiscriminationByPhotonPtSumOutsideSignalConeSeq,
     hpsPFTauDiscriminationByLooseElectronRejection,
     hpsPFTauDiscriminationByMediumElectronRejection,
     hpsPFTauDiscriminationByTightElectronRejection,
