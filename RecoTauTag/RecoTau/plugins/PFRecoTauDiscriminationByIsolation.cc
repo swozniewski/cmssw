@@ -765,6 +765,7 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   
   // options for various stored ID raw values
   edm::ParameterSetDescription desc_idlist;
+  desc_idlist.add<string>("IDname"); //not needed by producer but required for mapping at PAT level
   desc_idlist.add<bool>("storeRawSumPt");
   desc_idlist.add<bool>("storeRawPUsumPt");
   desc_idlist.add<bool>("storeRawOccupancy");
@@ -779,6 +780,7 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   desc.addVPSet("IDdefinitions", desc_idlist, vpsd_idlist);
   // options for various stored ID WPs
   edm::ParameterSetDescription desc_idwplist;
+  desc_idwplist.add<string>("IDname"); //not needed by producer but required for mapping at PAT level
   desc_idwplist.add<double>("maximumSumPtCut");
   desc_idwplist.add<unsigned int>("maximumOccupancy");
   desc_idwplist.add<double>("relativeSumPtCut");
@@ -789,6 +791,7 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   desc_idwplist.add<bool>("applyDeltaBetaCorrection");
   desc_idwplist.add<bool>("UseAllPFCandsForWeights");
   edm::ParameterSet pset_idwplist; //define default pset for WP
+  pset_idwplist.addParameter<string>("IDname", "pfRecoTauDiscriminationByIsolation");
   pset_idwplist.addParameter<double>("maximumSumPtCut", -1.0);
   pset_idwplist.addParameter<int>("maximumOccupancy", 0);
   pset_idwplist.addParameter<double>("relativeSumPtCut", -1.0);
