@@ -766,30 +766,30 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   // options for various stored ID raw values
   edm::ParameterSetDescription desc_idlist;
   desc_idlist.add<string>("IDname"); //not needed by producer but required for mapping at PAT level
-  desc_idlist.add<bool>("storeRawSumPt");
-  desc_idlist.add<bool>("storeRawPUsumPt");
-  desc_idlist.add<bool>("storeRawOccupancy");
-  desc_idlist.add<bool>("storeRawFootprintCorrection");
-  desc_idlist.add<bool>("storeRawPhotonSumPt_outsideSignalCone");
-  desc_idlist.add<bool>("ApplyDiscriminationByECALIsolation");
-  desc_idlist.add<bool>("ApplyDiscriminationByWeightedECALIsolation");
-  desc_idlist.add<bool>("ApplyDiscriminationByTrackerIsolation");
-  desc_idlist.add<bool>("applyDeltaBetaCorrection");
-  desc_idlist.add<bool>("UseAllPFCandsForWeights");
+  desc_idlist.add<bool>("storeRawSumPt", false);
+  desc_idlist.add<bool>("storeRawPUsumPt", false);
+  desc_idlist.add<bool>("storeRawOccupancy", false);
+  desc_idlist.add<bool>("storeRawFootprintCorrection", false);
+  desc_idlist.add<bool>("storeRawPhotonSumPt_outsideSignalCone", false);
+  desc_idlist.add<bool>("ApplyDiscriminationByECALIsolation", false);
+  desc_idlist.add<bool>("ApplyDiscriminationByWeightedECALIsolation", false);
+  desc_idlist.add<bool>("ApplyDiscriminationByTrackerIsolation", false);
+  desc_idlist.add<bool>("applyDeltaBetaCorrection", false);
+  desc_idlist.add<bool>("UseAllPFCandsForWeights", false);
   std::vector<edm::ParameterSet> vpsd_idlist; //by default, don't store any raw value
   desc.addVPSet("IDdefinitions", desc_idlist, vpsd_idlist);
   // options for various stored ID WPs
   edm::ParameterSetDescription desc_idwplist;
   desc_idwplist.add<string>("IDname"); //not needed by producer but required for mapping at PAT level
-  desc_idwplist.add<double>("maximumSumPtCut");
-  desc_idwplist.add<unsigned int>("maximumOccupancy");
-  desc_idwplist.add<double>("relativeSumPtCut");
-  desc_idwplist.add<double>("relativeSumPtOffset");
-  desc_idwplist.add<bool>("ApplyDiscriminationByECALIsolation");
-  desc_idwplist.add<bool>("ApplyDiscriminationByWeightedECALIsolation");
-  desc_idwplist.add<bool>("ApplyDiscriminationByTrackerIsolation");
-  desc_idwplist.add<bool>("applyDeltaBetaCorrection");
-  desc_idwplist.add<bool>("UseAllPFCandsForWeights");
+  desc_idwplist.add<double>("maximumSumPtCut", -1.0);
+  desc_idwplist.add<int>("maximumOccupancy", -1);
+  desc_idwplist.add<double>("relativeSumPtCut", -1.0);
+  desc_idwplist.add<double>("relativeSumPtOffset", 0.0);
+  desc_idwplist.add<bool>("ApplyDiscriminationByECALIsolation", false);
+  desc_idwplist.add<bool>("ApplyDiscriminationByWeightedECALIsolation", false);
+  desc_idwplist.add<bool>("ApplyDiscriminationByTrackerIsolation", false);
+  desc_idwplist.add<bool>("applyDeltaBetaCorrection", false);
+  desc_idwplist.add<bool>("UseAllPFCandsForWeights", false);
   edm::ParameterSet pset_idwplist; //define default pset for WP
   pset_idwplist.addParameter<string>("IDname", "pfRecoTauDiscriminationByIsolation");
   pset_idwplist.addParameter<double>("maximumSumPtCut", -1.0);
