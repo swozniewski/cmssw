@@ -105,6 +105,9 @@ public:
       maximumRelativeSumPt_.push_back(wpDefsEntry->getParameter<double>("relativeSumPtCut"));
       offsetRelativeSumPt_.push_back(wpDefsEntry->getParameter<double>("relativeSumPtOffset"));
       applyRelativeSumPtCut_.push_back(maximumRelativeSumPt_.back() >= 0.0);
+      applyPhotonPtSumOutsideSignalConeCut_.push_back(wpDefsEntry->getParameter<bool>("applyPhotonPtSumOutsideSignalConeCut"));
+      maxAbsPhotonSumPt_outsideSignalCone_.push_back(wpDefsEntry->getParameter<double>("maxAbsPhotonSumPt_outsideSignalCone"));
+      maxRelPhotonSumPt_outsideSignalCone_.push_back(wpDefsEntry->getParameter<double>("maxRelPhotonSumPt_outsideSignalCone"));
 
       includeGammas_.push_back(wpDefsEntry->getParameter<bool>("ApplyDiscriminationByECALIsolation"));
       if (includeGammas_.back()) gammasNeeded_ = true;
@@ -125,12 +128,6 @@ public:
     }
 
     customIsoCone_ = pset.getParameter<double>("customOuterCone");
-
-    applyPhotonPtSumOutsideSignalConeCut_ = pset.getParameter<bool>("applyPhotonPtSumOutsideSignalConeCut");
-    if (applyPhotonPtSumOutsideSignalConeCut_) {
-      maxAbsPhotonSumPt_outsideSignalCone_ = pset.getParameter<double>("maxAbsPhotonSumPt_outsideSignalCone");
-      maxRelPhotonSumPt_outsideSignalCone_ = pset.getParameter<double>("maxRelPhotonSumPt_outsideSignalCone");
-    }
 
     applyFootprintCorrection_ = pset.getParameter<bool>("applyFootprintCorrection");
     if (applyFootprintCorrection_ || storeRawFootprintCorrection) {
@@ -233,10 +230,6 @@ private:
   // RIC:
   double minPtForNoIso_;
 
-  bool applyPhotonPtSumOutsideSignalConeCut_;
-  double maxAbsPhotonSumPt_outsideSignalCone_;
-  double maxRelPhotonSumPt_outsideSignalCone_;
-
   bool applyFootprintCorrection_;
   struct FootprintCorrection {
     FootprintCorrection(const std::string& selection, const std::string& offset)
@@ -257,6 +250,9 @@ private:
   std::vector<bool> applyRelativeSumPtCut_;
   std::vector<double> maximumRelativeSumPt_;
   std::vector<double> offsetRelativeSumPt_;
+  std::vector<bool> applyPhotonPtSumOutsideSignalConeCut_;
+  std::vector<double> maxAbsPhotonSumPt_outsideSignalCone_;
+  std::vector<double> maxRelPhotonSumPt_outsideSignalCone_;
   // Options used for both raw and WP definitions
   std::vector<bool> includeGammas_;
   std::vector<bool> calculateWeights_;
@@ -591,7 +587,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
 
     bool failsPhotonPtSumOutsideSignalConeCut = false;
     double photonSumPt_outsideSignalCone = 0.;
-    if (applyPhotonPtSumOutsideSignalConeCut_ || (output_is_raw && storeRawValue_.at(i)==PhotonSumPt)) {
+    if (applyPhotonPtSumOutsideSignalConeCut_.at(iwp) || (output_is_raw && storeRawValue_.at(i)==PhotonSumPt)) {
       const std::vector<reco::CandidatePtr>& signalGammas = pfTau->signalGammaCands();
       for (std::vector<reco::CandidatePtr>::const_iterator signalGamma = signalGammas.begin();
            signalGamma != signalGammas.end();
@@ -600,8 +596,8 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
         if (dR > pfTau->signalConeSize())
           photonSumPt_outsideSignalCone += (*signalGamma)->pt();
       }
-      if (photonSumPt_outsideSignalCone > maxAbsPhotonSumPt_outsideSignalCone_ ||
-          photonSumPt_outsideSignalCone > (maxRelPhotonSumPt_outsideSignalCone_ * pfTau->pt())) {
+      if (photonSumPt_outsideSignalCone > maxAbsPhotonSumPt_outsideSignalCone_.at(iwp) ||
+          photonSumPt_outsideSignalCone > (maxRelPhotonSumPt_outsideSignalCone_.at(iwp) * pfTau->pt())) {
         failsPhotonPtSumOutsideSignalConeCut = true;
       }
     }
@@ -609,7 +605,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
     bool fails = !output_is_raw &&
                  ((applyOccupancyCut_.at(iwp) && failsOccupancyCut) || (applySumPtCut_.at(iwp) && failsSumPtCut) ||
                  (applyRelativeSumPtCut_.at(iwp) && failsRelativeSumPtCut) ||
-                 (applyPhotonPtSumOutsideSignalConeCut_ && failsPhotonPtSumOutsideSignalConeCut));
+                 (applyPhotonPtSumOutsideSignalConeCut_.at(iwp) && failsPhotonPtSumOutsideSignalConeCut));
 
     if (pfTau->pt() > minPtForNoIso_ && minPtForNoIso_ > 0.) {
       return 1.;
@@ -694,7 +690,6 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   }
 
   desc.add<double>("minTauPtForNoIso", -99.0);
-  desc.add<double>("maxAbsPhotonSumPt_outsideSignalCone", 1000000000.0);
   desc.add<edm::InputTag>("vertexSrc", edm::InputTag("offlinePrimaryVertices"));
   desc.add<double>("rhoConeSize", 0.5);
   desc.add<edm::InputTag>("rhoProducer", edm::InputTag("fixedGridRhoFastjetAll"));
@@ -751,13 +746,11 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
 
   desc.add<int>("verbosity", 0);
 
-  desc.add<bool>("applyPhotonPtSumOutsideSignalConeCut", false);
   desc.add<bool>("deltaBetaPUTrackPtCutOverride", false);
   desc.add<bool>("applyRhoCorrection", false);
 
   desc.add<double>("WeightECALIsolation", 1.0);
   desc.add<double>("rhoUEOffsetCorrection", 1.0);
-  desc.add<double>("maxRelPhotonSumPt_outsideSignalCone", 0.1);
   desc.add<double>("deltaBetaPUTrackPtCutOverride_val", -1.5);
   desc.add<double>("isoConeSizeForDeltaBeta", 0.5);
   desc.add<double>("customOuterCone", -1.0);
@@ -785,6 +778,9 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   desc_idwplist.add<int>("maximumOccupancy", -1);
   desc_idwplist.add<double>("relativeSumPtCut", -1.0);
   desc_idwplist.add<double>("relativeSumPtOffset", 0.0);
+  desc_idwplist.add<bool>("applyPhotonPtSumOutsideSignalConeCut", false);
+  desc_idwplist.add<double>("maxAbsPhotonSumPt_outsideSignalCone", 1000000000.0);
+  desc_idwplist.add<double>("maxRelPhotonSumPt_outsideSignalCone", 0.1);
   desc_idwplist.add<bool>("ApplyDiscriminationByECALIsolation", false);
   desc_idwplist.add<bool>("ApplyDiscriminationByWeightedECALIsolation", false);
   desc_idwplist.add<bool>("ApplyDiscriminationByTrackerIsolation", false);
@@ -796,6 +792,9 @@ void PFRecoTauDiscriminationByIsolation::fillDescriptions(edm::ConfigurationDesc
   pset_idwplist.addParameter<int>("maximumOccupancy", 0);
   pset_idwplist.addParameter<double>("relativeSumPtCut", -1.0);
   pset_idwplist.addParameter<double>("relativeSumPtOffset", 0.0);
+  pset_idwplist.addParameter<bool>("applyPhotonPtSumOutsideSignalConeCut", false);
+  pset_idwplist.addParameter<double>("maxAbsPhotonSumPt_outsideSignalCone", 1000000000.0);
+  pset_idwplist.addParameter<double>("maxRelPhotonSumPt_outsideSignalCone", 0.1);
   pset_idwplist.addParameter<bool>("ApplyDiscriminationByECALIsolation", true);
   pset_idwplist.addParameter<bool>("ApplyDiscriminationByWeightedECALIsolation", false);
   pset_idwplist.addParameter<bool>("ApplyDiscriminationByTrackerIsolation", true);
