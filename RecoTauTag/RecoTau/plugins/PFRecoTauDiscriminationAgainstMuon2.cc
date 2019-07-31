@@ -373,12 +373,14 @@ void PFRecoTauDiscriminationAgainstMuon2::fillDescriptions(edm::ConfigurationDes
   desc.add<edm::InputTag>("srcMuons", edm::InputTag("muons"));
   
   edm::ParameterSetDescription desc_wp;
+  desc_wp.add<std::string>("IDname");
   desc_wp.add<std::string>("discriminatorOption");
   desc_wp.add<double>("HoPMin");
   desc_wp.add<int>("maxNumberOfMatches");
   desc_wp.add<bool>("doCaloMuonVeto");
   desc_wp.add<int>("maxNumberOfHitsLast2Stations");
   edm::ParameterSet pset_wp;
+  pset_wp.addParameter<std::string>("pfRecoTauDiscriminationAgainstMuon2", "IDname");
   pset_wp.addParameter<std::string>("discriminatorOption", "loose");
   pset_wp.addParameter<double>("HoPMin", 0.2);
   pset_wp.addParameter<int>("maxNumberOfMatches", 0);
