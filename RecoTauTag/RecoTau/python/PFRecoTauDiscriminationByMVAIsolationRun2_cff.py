@@ -75,11 +75,12 @@ discriminationByIsolationMVArun2v1raw = cms.EDProducer("PFRecoTauDiscriminationB
     # NOTE: tau lifetime reconstruction sequence needs to be run before
     srcTauTransverseImpactParameters = cms.InputTag(''),
     
-    srcChargedIsoPtSum = cms.InputTag('chargedIsoPtSum'),
-    srcNeutralIsoPtSum = cms.InputTag('neutralIsoPtSum'),
-    srcPUcorrPtSum = cms.InputTag('puCorrPtSum'),
-    srcPhotonPtSumOutsideSignalCone = cms.InputTag('photonPtSumOutsideSignalCone'),
-    srcFootprintCorrection = cms.InputTag('footprintCorrection'),
+    srcBasicTauDiscriminators = cms.InputTag('hpsPFTauBasicDiscriminators'),
+    srcChargedIsoPtSumIndex = cms.int32(0),
+    srcNeutralIsoPtSumIndex = cms.int32(1),
+    srcPUcorrPtSumIndex = cms.int32(5),
+    srcPhotonPtSumOutsideSignalConeIndex = cms.int32(4),
+    srcFootprintCorrectionIndex = cms.int32(3),
 
     verbosity = cms.int32(0)
 )
@@ -88,7 +89,6 @@ discriminationByIsolationMVArun2v1 = recoTauDiscriminantCutMultiplexer.clone(
     PFTauProducer = cms.InputTag('pfTauProducer'),    
     Prediscriminants = requireLeadTrack,
     toMultiplex = cms.InputTag('discriminationByIsolationMVArun2v1raw'),
-    key = cms.InputTag('discriminationByIsolationMVArun2v1raw:category'),
     loadMVAfromDB = cms.bool(True),
     mapping = cms.VPSet(
         cms.PSet(
