@@ -284,6 +284,7 @@ TauDiscriminatorValueType TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef,
     }
   }
   if ((*toMultiplexHandle_)[tau].rawValues.size()<2) {
+        std::cout << (*toMultiplexHandle_)[tau].rawValues.size() << " - " << (*toMultiplexHandle_)[tau].rawValues.at(0) << std::endl;
       throw cms::Exception("TauDiscriminantCutMultiplexerBase") 
         << " Input discriminator is expected to have a second component defining the event category!";
   }
@@ -364,6 +365,7 @@ void TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValu
     desc.addVPSet("mapping", desc_mapping, vpsd_mapping);
   }
 
+  desc.add<std::vector<std::string>>("workingPoints");
   desc.add<edm::FileInPath>("inputFileName", edm::FileInPath("RecoTauTag/RecoTau/data/emptyMVAinputFile"));
   desc.add<bool>("loadMVAfromDB", true);
   ParentClass::fillProducerDescriptions(desc);  // inherited from the base
