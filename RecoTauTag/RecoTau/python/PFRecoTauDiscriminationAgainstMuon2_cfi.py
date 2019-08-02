@@ -12,13 +12,6 @@ pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAga
     #  2) a track OR a pi-zero in the signal cone has pT > 5 GeV
     Prediscriminants = requireLeadTrack,
 
-    # algorithm parameters
-    discriminatorOption = cms.string('loose'), # available options are: 'loose', 'medium', 'tight' and 'custom'
-    HoPMin = cms.double(0.2),
-    maxNumberOfMatches = cms.int32(0), # negative value would turn off this cut in case of 'custom' discriminator 
-    doCaloMuonVeto = cms.bool(False),
-    maxNumberOfHitsLast2Stations = cms.int32(0), # negative value would turn off this cut in case of 'custom' discriminator 
-
     # optional collection of muons to check for overlap with taus
     srcMuons = cms.InputTag('muons'),
     dRmuonMatch = cms.double(0.3),
@@ -35,6 +28,17 @@ pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAga
     maskHitsDT = cms.vint32(0,0,0,0),
     maskHitsCSC = cms.vint32(0,0,0,0),
     maskHitsRPC = cms.vint32(0,0,0,0),
+    
+    wpDefinitions = cms.VPSet(
+        cms.PSet(
+            IDname = cms.string('pfRecoTauDiscriminationAgainstMuon2'),
+            discriminatorOption = cms.string('loose'), # available options are: 'loose', 'medium', 'tight' and 'custom'
+            HoPMin = cms.double(0.2),
+            maxNumberOfMatches = cms.int32(0), # negative value would turn off this cut in case of 'custom' discriminator 
+            doCaloMuonVeto = cms.bool(False),
+            maxNumberOfHitsLast2Stations = cms.int32(0) # negative value would turn off this cut in case of 'custom' discriminator
+        )
+    ),
 
     verbosity = cms.int32(0)
 )
