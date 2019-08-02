@@ -46,11 +46,11 @@ public:
     weightsNeeded_ = false;
     tracksNeeded_ = false;
     gammasNeeded_ = false;
+    storeRawValue_.clear();
     std::vector<edm::ParameterSet> rawDefs = pset.getParameter<std::vector<edm::ParameterSet>>("IDdefinitions");
     for(std::vector<edm::ParameterSet>::iterator rawDefsEntry = rawDefs.begin(); rawDefsEntry != rawDefs.end(); ++rawDefsEntry){
       // Can only store one type
       int numStoreOptions = 0;
-      storeRawValue_.clear();
       if (rawDefsEntry->getParameter<bool>("storeRawSumPt")){
         storeRawValue_.push_back(SumPt);
         ++numStoreOptions;
@@ -188,7 +188,6 @@ public:
       rhoConeSize_ = pset.getParameter<double>("rhoConeSize");
       rhoUEOffsetCorrection_ = pset.getParameter<double>("rhoUEOffsetCorrection");
     }
-    useAllPFCands_ = pset.getParameter<bool>("UseAllPFCandsForWeights");
 
     verbosity_ = pset.getParameter<int>("verbosity");
   }
@@ -279,7 +278,6 @@ private:
 
   // Rho correction
   bool applyRhoCorrection_;
-  bool useAllPFCands_;
   edm::InputTag rhoProducer_;
   edm::EDGetTokenT<double> rho_token;
   double rhoConeSize_;
@@ -336,14 +334,20 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
   std::vector<CandidatePtr> isoCharged_;
   std::vector<CandidatePtr> isoNeutral_;
   std::vector<CandidatePtr> isoPU_;
+  std::vector<CandidatePtr> isoPUall_;
   CandidateCollection isoNeutralWeight_;
+  CandidateCollection isoNeutralWeight_UseAllPFCands_;
   std::vector<CandidatePtr> chPV_;
+  std::vector<CandidatePtr> chPVall_;
   isoCharged_.reserve(pfTau->isolationChargedHadrCands().size());
   isoNeutral_.reserve(pfTau->isolationGammaCands().size());
   isoPU_.reserve(std::min(100UL, chargedPFCandidatesInEvent_.size()));
+  isoPUall_.reserve(std::min(100UL, chargedPFCandidatesInEvent_.size()));
   isoNeutralWeight_.reserve(pfTau->isolationGammaCands().size());
+  isoNeutralWeight_UseAllPFCands_.reserve(pfTau->isolationGammaCands().size());
 
   chPV_.reserve(std::min(50UL, chargedPFCandidatesInEvent_.size()));
+  chPVall_.reserve(std::min(50UL, chargedPFCandidatesInEvent_.size()));
 
   // Get the primary vertex associated to this tau
   reco::VertexRef pv = vertexAssociator_->associatedVertex(*pfTau);
@@ -414,29 +418,26 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
     LogTrace("discriminate") << "After track cuts: " << allPU.size();
 
     // Now apply the rest of the cuts, like pt, and TIP, tracker hits, etc
-    if (!useAllPFCands_) {
-      std::vector<CandidatePtr> cleanPU = pileupQcutsGeneralQCuts_->filterCandRefs(allPU);
+    std::vector<CandidatePtr> cleanPU = pileupQcutsGeneralQCuts_->filterCandRefs(allPU);
 
-      std::vector<CandidatePtr> cleanNPU = pileupQcutsGeneralQCuts_->filterCandRefs(allNPU);
+    std::vector<CandidatePtr> cleanNPU = pileupQcutsGeneralQCuts_->filterCandRefs(allNPU);
 
-      LogTrace("discriminate") << "After cleaning cuts: " << cleanPU.size();
+    LogTrace("discriminate") << "After cleaning cuts: " << cleanPU.size();
 
-      // Only select PU tracks inside the isolation cone.
-      DRFilter deltaBetaFilter(pfTau->p4(), 0, deltaBetaCollectionCone_);
-      for (auto const& cand : cleanPU) {
-        if (deltaBetaFilter(cand))
-          isoPU_.push_back(cand);
-      }
-
-      for (auto const& cand : cleanNPU) {
-        if (deltaBetaFilter(cand))
-          chPV_.push_back(cand);
-      }
-      LogTrace("discriminate") << "After cone cuts: " << isoPU_.size() << " " << chPV_.size();
-    } else {
-      isoPU_ = std::move(allPU);
-      chPV_ = std::move(allNPU);
+    // Only select PU tracks inside the isolation cone.
+    DRFilter deltaBetaFilter(pfTau->p4(), 0, deltaBetaCollectionCone_);
+    for (auto const& cand : cleanPU) {
+      if (deltaBetaFilter(cand))
+        isoPU_.push_back(cand);
     }
+
+    for (auto const& cand : cleanNPU) {
+      if (deltaBetaFilter(cand))
+        chPV_.push_back(cand);
+    }
+    LogTrace("discriminate") << "After cone cuts: " << isoPU_.size() << " " << chPV_.size();
+    isoPUall_ = std::move(allPU);
+    chPVall_ = std::move(allNPU);
   }
 
   if (weightsNeeded_) {
@@ -444,19 +445,32 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
       if (isoObject->charge() != 0) {
         // weight only neutral objects
         isoNeutralWeight_.push_back(*isoObject);
+        isoNeutralWeight_UseAllPFCands_.push_back(*isoObject);
         continue;
       }
 
       double eta = isoObject->eta();
       double phi = isoObject->phi();
-      double sumNPU = 0.5 * log(weightedSum(chPV_, eta, phi));
+      {
+        double sumNPU = 0.5 * log(weightedSum(chPV_, eta, phi));
 
-      double sumPU = 0.5 * log(weightedSum(isoPU_, eta, phi));
-      LeafCandidate neutral(*isoObject);
-      if ((sumNPU + sumPU) > 0)
-        neutral.setP4(((sumNPU) / (sumNPU + sumPU)) * neutral.p4());
+        double sumPU = 0.5 * log(weightedSum(isoPU_, eta, phi));
+        LeafCandidate neutral(*isoObject);
+        if ((sumNPU + sumPU) > 0)
+          neutral.setP4(((sumNPU) / (sumNPU + sumPU)) * neutral.p4());
 
-      isoNeutralWeight_.push_back(neutral);
+        isoNeutralWeight_.push_back(neutral);
+      }
+      {
+        double sumNPU = 0.5 * log(weightedSum(chPVall_, eta, phi));
+
+        double sumPU = 0.5 * log(weightedSum(isoPUall_, eta, phi));
+        LeafCandidate neutral(*isoObject);
+        if ((sumNPU + sumPU) > 0)
+          neutral.setP4(((sumNPU) / (sumNPU + sumPU)) * neutral.p4());
+
+        isoNeutralWeight_UseAllPFCands_.push_back(neutral);
+      }
     }
   }
 
@@ -466,7 +480,6 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
     DRFilter2 filter2(pfTau->p4(), 0, customIsoCone_);
     std::vector<CandidatePtr> isoCharged_filter;
     std::vector<CandidatePtr> isoNeutral_filter;
-    CandidateCollection isoNeutralWeight_filter;
     // Remove all the objects not in our iso cone
     for (auto const& isoObject : isoCharged_) {
       if (filter(isoObject))
@@ -479,11 +492,22 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
       }
       isoNeutral_ = isoNeutral_filter;
     } else {
-      for (auto const& isoObject : isoNeutralWeight_) {
-        if (filter2(isoObject))
-          isoNeutralWeight_filter.push_back(isoObject);
+      {
+        CandidateCollection isoNeutralWeight_filter;
+        for (auto const& isoObject : isoNeutralWeight_) {
+          if (filter2(isoObject))
+            isoNeutralWeight_filter.push_back(isoObject);
+        }
+        isoNeutralWeight_ = isoNeutralWeight_filter;
       }
-      isoNeutralWeight_ = isoNeutralWeight_filter;
+      {
+        CandidateCollection isoNeutralWeight_filter;
+        for (auto const& isoObject : isoNeutralWeight_UseAllPFCands_) {
+          if (filter2(isoObject))
+            isoNeutralWeight_filter.push_back(isoObject);
+        }
+        isoNeutralWeight_UseAllPFCands_ = isoNeutralWeight_filter;
+      }
     }
     isoCharged_ = isoCharged_filter;
   }
@@ -541,8 +565,14 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
           neutralPt += isoObject->pt();
         }
       } else {
-        for (auto const& isoObject : isoNeutralWeight_) {
-          weightedNeutralPt += isoObject.pt();
+        if (useAllPFCandsForWeights_.at(i)){
+          for (auto const& isoObject : isoNeutralWeight_UseAllPFCands_) {
+            weightedNeutralPt += isoObject.pt();
+          }
+        } else {
+          for (auto const& isoObject : isoNeutralWeight_) {
+            weightedNeutralPt += isoObject.pt();
+          }
         }
       }
       for (auto const& isoObject : isoPU_) {
@@ -575,9 +605,9 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
       }
 
       totalPt = chargedPt + weightGammas_ * neutralPt;
-      LogTrace("discriminate") << "totalPt = " << totalPt << " (cut = " << maximumSumPtCut_.at(iwp) << ")";
 
       if(!output_is_raw){
+        LogTrace("discriminate") << "totalPt = " << totalPt << " (cut = " << maximumSumPtCut_.at(iwp) << ")";
         failsSumPtCut = (totalPt > maximumSumPtCut_.at(iwp));
 
         //--- Relative Sum PT requirement
@@ -587,7 +617,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
 
     bool failsPhotonPtSumOutsideSignalConeCut = false;
     double photonSumPt_outsideSignalCone = 0.;
-    if (applyPhotonPtSumOutsideSignalConeCut_.at(iwp) || (output_is_raw && storeRawValue_.at(i)==PhotonSumPt)) {
+    if ((!output_is_raw && applyPhotonPtSumOutsideSignalConeCut_.at(iwp)) || (output_is_raw && storeRawValue_.at(i)==PhotonSumPt)) {
       const std::vector<reco::CandidatePtr>& signalGammas = pfTau->signalGammaCands();
       for (std::vector<reco::CandidatePtr>::const_iterator signalGamma = signalGammas.begin();
            signalGamma != signalGammas.end();
@@ -596,8 +626,8 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
         if (dR > pfTau->signalConeSize())
           photonSumPt_outsideSignalCone += (*signalGamma)->pt();
       }
-      if (photonSumPt_outsideSignalCone > maxAbsPhotonSumPt_outsideSignalCone_.at(iwp) ||
-          photonSumPt_outsideSignalCone > (maxRelPhotonSumPt_outsideSignalCone_.at(iwp) * pfTau->pt())) {
+      if (!output_is_raw && (photonSumPt_outsideSignalCone > maxAbsPhotonSumPt_outsideSignalCone_.at(iwp) ||
+          photonSumPt_outsideSignalCone > (maxRelPhotonSumPt_outsideSignalCone_.at(iwp) * pfTau->pt()))) {
         failsPhotonPtSumOutsideSignalConeCut = true;
       }
     }
@@ -607,9 +637,10 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
                  (applyRelativeSumPtCut_.at(iwp) && failsRelativeSumPtCut) ||
                  (applyPhotonPtSumOutsideSignalConeCut_.at(iwp) && failsPhotonPtSumOutsideSignalConeCut));
 
-    if (pfTau->pt() > minPtForNoIso_ && minPtForNoIso_ > 0.) {
-      return 1.;
+    if (!output_is_raw && pfTau->pt() > minPtForNoIso_ && minPtForNoIso_ > 0.) {
       LogDebug("discriminate") << "tau pt = " << pfTau->pt() << "\t  min cutoff pt = " << minPtForNoIso_;
+      result.workingPoints.push_back(true);
+      continue;
     }
 
     // We did error checking in the constructor, so this is safe.
@@ -624,7 +655,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
         else
           result.rawValues.push_back(0.);
       } else if (storeRawValue_.at(i)==Occupancy) {
-        return nOccupants;
+        result.rawValues.push_back(nOccupants);
       } else if (storeRawValue_.at(i)==FootPrintCorrection) {
         result.rawValues.push_back(footprintCorrection_value);
       } else if (storeRawValue_.at(i)==PhotonSumPt) {
