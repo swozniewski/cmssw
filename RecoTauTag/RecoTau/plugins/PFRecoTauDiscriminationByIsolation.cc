@@ -485,31 +485,28 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
       if (filter(isoObject))
         isoCharged_filter.push_back(isoObject);
     }
-    if (!weightsNeeded_) {
-      for (auto const& isoObject : isoNeutral_) {
-        if (filter(isoObject))
-          isoNeutral_filter.push_back(isoObject);
-      }
-      isoNeutral_ = isoNeutral_filter;
-    } else {
-      {
-        CandidateCollection isoNeutralWeight_filter;
-        for (auto const& isoObject : isoNeutralWeight_) {
-          if (filter2(isoObject))
-            isoNeutralWeight_filter.push_back(isoObject);
-        }
-        isoNeutralWeight_ = isoNeutralWeight_filter;
-      }
-      {
-        CandidateCollection isoNeutralWeight_filter;
-        for (auto const& isoObject : isoNeutralWeight_UseAllPFCands_) {
-          if (filter2(isoObject))
-            isoNeutralWeight_filter.push_back(isoObject);
-        }
-        isoNeutralWeight_UseAllPFCands_ = isoNeutralWeight_filter;
-      }
-    }
     isoCharged_ = isoCharged_filter;
+    for (auto const& isoObject : isoNeutral_) {
+      if (filter(isoObject))
+        isoNeutral_filter.push_back(isoObject);
+    }
+    isoNeutral_ = isoNeutral_filter;
+    {
+      CandidateCollection isoNeutralWeight_filter;
+      for (auto const& isoObject : isoNeutralWeight_) {
+        if (filter2(isoObject))
+          isoNeutralWeight_filter.push_back(isoObject);
+      }
+      isoNeutralWeight_ = isoNeutralWeight_filter;
+    }
+    {
+      CandidateCollection isoNeutralWeight_filter;
+      for (auto const& isoObject : isoNeutralWeight_UseAllPFCands_) {
+        if (filter2(isoObject))
+          isoNeutralWeight_filter.push_back(isoObject);
+      }
+      isoNeutralWeight_UseAllPFCands_ = isoNeutralWeight_filter;
+    }
   }
 
   //Now all needed incredients are ready. Loop over all ID configurations and produce output
@@ -557,14 +554,13 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
       double chargedPt = 0.;
       double neutralPt = 0.;
       double weightedNeutralPt = 0.;
-      for (auto const& isoObject : isoCharged_) {
-        chargedPt += isoObject->pt();
-      }
-      if (!calculateWeights_.at(i)) {
-        for (auto const& isoObject : isoNeutral_) {
-          neutralPt += isoObject->pt();
+      if (includeTracks_.at(i)){
+        for (auto const& isoObject : isoCharged_) {
+          chargedPt += isoObject->pt();
         }
-      } else {
+      }
+
+      if (calculateWeights_.at(i)) {
         if (useAllPFCandsForWeights_.at(i)){
           for (auto const& isoObject : isoNeutralWeight_UseAllPFCands_) {
             weightedNeutralPt += isoObject.pt();
@@ -573,6 +569,10 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolation::disc
           for (auto const& isoObject : isoNeutralWeight_) {
             weightedNeutralPt += isoObject.pt();
           }
+        }
+      } else if (includeGammas_.at(i)) {
+        for (auto const& isoObject : isoNeutral_) {
+          neutralPt += isoObject->pt();
         }
       }
       for (auto const& isoObject : isoPU_) {
