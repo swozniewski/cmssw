@@ -283,12 +283,11 @@ TauDiscriminatorValueType TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef,
       std::cout << "disc_result (normalized) = " << disc_result << std::endl;
     }
   }
-  if ((*toMultiplexHandle_)[tau].rawValues.size()<2) {
-        std::cout << (*toMultiplexHandle_)[tau].rawValues.size() << " - " << (*toMultiplexHandle_)[tau].rawValues.at(0) << std::endl;
-      throw cms::Exception("TauDiscriminantCutMultiplexerBase") 
-        << " Input discriminator is expected to have a second component defining the event category!";
+  double key_result = 0.0;
+  if ((*toMultiplexHandle_)[tau].rawValues.size()==2){
+    key_result = (*toMultiplexHandle_)[tau].rawValues.at(1);
+    result.rawValues.push_back(key_result);
   }
-  double key_result = (*toMultiplexHandle_)[tau].rawValues.at(1);
   typename DiscriminantCutMap::const_iterator cutWPsIter = cuts_.find(TMath::Nint(key_result));
 
   // Return null if it doesn't exist
