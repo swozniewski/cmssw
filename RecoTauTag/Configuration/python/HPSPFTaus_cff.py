@@ -71,6 +71,7 @@ hpsPFTauBasicDiscriminators = pfRecoTauDiscriminationByIsolation.clone(
     Prediscriminants = requireDecayMode.clone(),
     deltaBetaPUTrackPtCutOverride     = True, # Set the boolean = True to override.
     deltaBetaPUTrackPtCutOverride_val = 0.5,  # Set the value for new value.
+    customOuterCone = PFRecoTauPFJetInputs.isolationConeSize,
     isoConeSizeForDeltaBeta = 0.8,
     deltaBetaFactor = "%0.4f"%(ak4dBetaCorrection),
     IDdefinitions = cms.VPSet(
@@ -116,6 +117,8 @@ hpsPFTauBasicDiscriminators = pfRecoTauDiscriminationByIsolation.clone(
             IDname = cms.string("ByLooseCombinedIsolationDBSumPtCorr3Hits"),
             maximumSumPtCut = cms.double(2.5),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -124,6 +127,8 @@ hpsPFTauBasicDiscriminators = pfRecoTauDiscriminationByIsolation.clone(
             IDname = cms.string("ByMediumCombinedIsolationDBSumPtCorr3Hits"),
             maximumSumPtCut = cms.double(1.5),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -132,6 +137,8 @@ hpsPFTauBasicDiscriminators = pfRecoTauDiscriminationByIsolation.clone(
             IDname = cms.string("ByTightCombinedIsolationDBSumPtCorr3Hits"),
             maximumSumPtCut = cms.double(0.8),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -151,6 +158,11 @@ hpsPFTauBasicDiscriminators = pfRecoTauDiscriminationByIsolation.clone(
         )
 )
 hpsPFTauBasicDiscriminators.qualityCuts.isolationQualityCuts.minTrackHits = cms.uint32(3)
+hpsPFTauBasicDiscriminators.qualityCuts.isolationQualityCuts.minGammaEt = cms.double(1.0)
+hpsPFTauBasicDiscriminators.qualityCuts.isolationQualityCuts.minTrackPt = cms.double(0.5)
+phase2_common.toModify(hpsPFTauBasicDiscriminators.qualityCuts,
+                       isolationQualityCuts = dict( minTrackPt = 0.8 )
+)
 hpsPFTauBasicDiscriminatorsTask = cms.Task(
     hpsPFTauBasicDiscriminators
 )
@@ -213,6 +225,8 @@ hpsPFTauBasicDiscriminatorsdR03 = hpsPFTauBasicDiscriminators.clone(
             IDname = cms.string("ByLooseCombinedIsolationDBSumPtCorr3HitsdR03"),
             maximumSumPtCut = cms.double(2.5),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -221,6 +235,8 @@ hpsPFTauBasicDiscriminatorsdR03 = hpsPFTauBasicDiscriminators.clone(
             IDname = cms.string("ByMediumCombinedIsolationDBSumPtCorr3HitsdR03"),
             maximumSumPtCut = cms.double(1.5),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -229,6 +245,8 @@ hpsPFTauBasicDiscriminatorsdR03 = hpsPFTauBasicDiscriminators.clone(
             IDname = cms.string("ByTightCombinedIsolationDBSumPtCorr3HitsdR03"),
             maximumSumPtCut = cms.double(0.8),
             ApplyDiscriminationByTrackerIsolation = cms.bool(True),
+            ApplyDiscriminationByECALIsolation = cms.bool(True),
+            applyDeltaBetaCorrection = cms.bool(True),
             applyPhotonPtSumOutsideSignalConeCut = cms.bool(True),
             maxAbsPhotonSumPt_outsideSignalCone = cms.double(1.e+9),
             maxRelPhotonSumPt_outsideSignalCone = cms.double(0.10)
@@ -242,12 +260,25 @@ hpsPFTauBasicDiscriminatorsdR03Seq = cms.Sequence(
     hpsPFTauBasicDiscriminatorsdR03Task
 )
 
-# define helper function to read indices of basic IDs
-def getBasicTauDiscriminatorRawIndex(module, IDname):
-    IDdefs = module.IDdefinitions.value()
-    for i in range(len(module.IDdefinitions.value())):
-        if IDname==IDdefs[i].IDname.value():
-            return i
+# define helper function to read indices of basic IDs or antimuon
+def getBasicTauDiscriminatorRawIndex(module, IDname, ignore_notfound=False):
+    if hasattr(module, "IDdefinitions"):
+        IDdefs = module.IDdefinitions.value()
+        for i in range(len(module.IDdefinitions.value())):
+            if IDname==IDdefs[i].IDname.value():
+                return i
+    if ignore_notfound: #used by combined searches for raw and WP indices which apply their own sanity checks
+        return None
+    print "Basic Tau Discriminator <{}> not found!".format(IDname)
+    raise Exception
+def getBasicTauDiscriminatorWPIndex(module, IDname, ignore_notfound=False):
+    if hasattr(module, "IDWPdefinitions"):
+        IDdefs = module.IDWPdefinitions.value()
+        for i in range(len(module.IDWPdefinitions.value())):
+            if IDname==IDdefs[i].IDname.value():
+                return i
+    if ignore_notfound: #used by combined searches for raw and WP indices which apply their own sanity checks
+        return None
     print "Basic Tau Discriminator <{}> not found!".format(IDname)
     raise Exception
 
@@ -256,7 +287,7 @@ def getBasicTauDiscriminatorRawIndex(module, IDname):
 hpsPFTauDiscriminationByMuonRejection3 = pfRecoTauDiscriminationAgainstMuon2.clone(
     PFTauProducer = cms.InputTag('hpsPFTauProducer'),
     Prediscriminants = noPrediscriminants,
-    wpDefinitions = cms.VPSet(
+    IDWPdefinitions = cms.VPSet(
         cms.PSet(
             IDname = cms.string('ByLooseMuonRejection3'),
             discriminatorOption = cms.string('custom'),

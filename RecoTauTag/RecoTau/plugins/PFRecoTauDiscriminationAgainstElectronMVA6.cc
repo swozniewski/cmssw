@@ -74,7 +74,7 @@ void PFRecoTauDiscriminationAgainstElectronMVA6::beginEvent(const edm::Event& ev
 
 reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationAgainstElectronMVA6::discriminate(const PFTauRef& thePFTauRef) const {
   reco::PFSingleTauDiscriminatorContainer result;
-  result.rawValues = {-99.,-1.};
+  result.rawValues = {1.,-1.};
   double category = -1.;
   bool isGsfElectronMatched = false;
 
@@ -147,6 +147,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationAgainstElectronMV
           if (vetoEcalCracks_ &&
               (isInEcalCrack(tauEtaAtEcalEntrance) || isInEcalCrack(leadChargedPFCandEtaAtEcalEntrance))) {
             // return MVA output value
+            result.rawValues.at(0) = -99.;
             return result;
           }
           //// Veto taus that go to Ecal crack
@@ -185,6 +186,7 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationAgainstElectronMV
         // add category index
         result.rawValues.at(1) = category;
         // return MVA output value
+        result.rawValues.at(0) = -99.;
         return result;
       }
       //// Veto taus that go to Ecal crack
