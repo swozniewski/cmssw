@@ -193,7 +193,7 @@ namespace reco {
 
     reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByMVAIsolationRun2::discriminate(const PFTauRef& tau) const {
       reco::PFSingleTauDiscriminatorContainer result;
-      result.rawValues = {-1.,0.}; // CV: define dummy category index in order to use RecoTauDiscriminantCutMultiplexer module to apply WP cuts
+      result.rawValues = {-1.};
 
       // CV: computation of MVA value requires presence of leading charged hadron
       if (tau->leadChargedHadrCand().isNull())
