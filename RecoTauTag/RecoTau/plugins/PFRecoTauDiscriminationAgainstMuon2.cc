@@ -41,11 +41,7 @@ namespace {
   public:
     explicit PFRecoTauDiscriminationAgainstMuon2(const edm::ParameterSet& cfg)
         : PFTauDiscriminationProducerBaseNEW(cfg), moduleLabel_(cfg.getParameter<std::string>("@module_label")) {
-      /*std::vector<edm::ParameterSet> temp = cfg.getParameter<std::vector<edm::ParameterSet>>("wpDefinitions");
-      for(std::vector<edm::ParameterSet>::const_iterator wpDefsEntry = temp.begin(); wpDefsEntry != temp.end(); ++wpDefsEntry){
-        wpDefs_.push_back(*wpDefsEntry);
-      }*/
-      wpDefs_ = cfg.getParameter<std::vector<edm::ParameterSet>>("wpDefinitions");
+      wpDefs_ = cfg.getParameter<std::vector<edm::ParameterSet>>("IDWPdefinitions");
       // check content of discriminatorOption and add as enum to avoid string comparison per event
       for(std::vector<edm::ParameterSet>::iterator wpDefsEntry = wpDefs_.begin(); wpDefsEntry != wpDefs_.end(); ++wpDefsEntry){
         std::string discriminatorOption_string = wpDefsEntry->getParameter<std::string>("discriminatorOption");
@@ -61,10 +57,6 @@ namespace {
           throw edm::Exception(edm::errors::UnimplementedFeature)
               << " Invalid Configuration parameter 'discriminatorOption' = " << discriminatorOption_string << " !!\n";
       }
-      //hop_ = cfg.getParameter<double>("HoPMin");
-      //maxNumberOfMatches_ = cfg.getParameter<int>("maxNumberOfMatches");
-      //doCaloMuonVeto_ = cfg.getParameter<bool>("doCaloMuonVeto");
-      //maxNumberOfHitsLast2Stations_ = cfg.getParameter<int>("maxNumberOfHitsLast2Stations");
       srcMuons_ = cfg.getParameter<edm::InputTag>("srcMuons");
       Muons_token = consumes<reco::MuonCollection>(srcMuons_);
       dRmuonMatch_ = cfg.getParameter<double>("dRmuonMatch");
@@ -90,11 +82,6 @@ namespace {
   private:
     std::string moduleLabel_;
     std::vector<edm::ParameterSet> wpDefs_;
-    //int discriminatorOption_;
-    //double hop_;
-    //int maxNumberOfMatches_;
-    //bool doCaloMuonVeto_;
-    //int maxNumberOfHitsLast2Stations_;
     edm::InputTag srcMuons_;
     edm::Handle<reco::MuonCollection> muons_;
     edm::EDGetTokenT<reco::MuonCollection> Muons_token;
@@ -388,7 +375,7 @@ void PFRecoTauDiscriminationAgainstMuon2::fillDescriptions(edm::ConfigurationDes
   pset_wp.addParameter<int>("maxNumberOfHitsLast2Stations", 0);
   std::vector<edm::ParameterSet> vpsd_wp;
   vpsd_wp.push_back(pset_wp);
-  desc.addVPSet("wpDefinitions", desc_wp, vpsd_wp);
+  desc.addVPSet("IDWPdefinitions", desc_wp, vpsd_wp);
   
   descriptions.add("pfRecoTauDiscriminationAgainstMuon2", desc);
 }

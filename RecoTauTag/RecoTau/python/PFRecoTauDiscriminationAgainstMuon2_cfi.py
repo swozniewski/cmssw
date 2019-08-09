@@ -29,7 +29,7 @@ pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAga
     maskHitsCSC = cms.vint32(0,0,0,0),
     maskHitsRPC = cms.vint32(0,0,0,0),
     
-    wpDefinitions = cms.VPSet(
+    IDWPdefinitions = cms.VPSet(
         cms.PSet(
             IDname = cms.string('pfRecoTauDiscriminationAgainstMuon2'),
             discriminatorOption = cms.string('loose'), # available options are: 'loose', 'medium', 'tight' and 'custom'

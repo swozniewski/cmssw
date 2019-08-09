@@ -86,7 +86,7 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet& iConfig)
       edm::ParameterSet idp = idps.getParameter<edm::ParameterSet>(*it);
       int wpidx = idp.getParameter<int>("workingPointIndex");
       edm::InputTag tag = idp.getParameter<edm::InputTag>("inputTag");
-      if (wpidx == -2){
+      if (wpidx == -99){
         tauIDSrcs_.push_back(NameTag(*it, tag));
       }else{
         std::map<std::string, IDContainerData>::iterator it2;
@@ -604,10 +604,12 @@ float PATTauProducer::getTauIdDiscriminator(const edm::Handle<TauCollectionType>
 float PATTauProducer::getTauIdDiscriminatorFromContainer(const edm::Handle<reco::PFTauCollection>& tauCollection, size_t tauIdx, const edm::Handle<reco::PFTauDiscriminatorContainer>& tauIdDiscr, int WPIdx)
 {
   edm::Ref<reco::PFTauCollection> tauRef(tauCollection, tauIdx);
-  if (WPIdx < 0) return (*tauIdDiscr)[tauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
-  else{
+  if (WPIdx < 0){
+      if ((*tauIdDiscr)[tauRef].rawValues.size()==1) return (*tauIdDiscr)[tauRef].rawValues.at(0); //Only 0th component filled with default value if prediscriminor in RecoTauDiscriminator failed.
+      return (*tauIdDiscr)[tauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
+  }else{
       if ((*tauIdDiscr)[tauRef].workingPoints.size()==0) return 0.0; //WP vector not filled if prediscriminor in RecoTauDiscriminator failed. Set PAT output to false in this case
-      else return (*tauIdDiscr)[tauRef].workingPoints.at(WPIdx);
+      return (*tauIdDiscr)[tauRef].workingPoints.at(WPIdx);
   }
 }
 
