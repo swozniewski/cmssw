@@ -38,5 +38,6 @@ patTauDiscriminantCutMultiplexer = cms.EDProducer(
             cut = cms.double(0.2),
         ),
     ),
+    workingPoints = cms.vstring(),
     verbosity = cms.int32(0)
 )
