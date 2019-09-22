@@ -398,11 +398,11 @@ hpsPFTauDiscriminationByMVA6ElectronRejection = recoTauDiscriminantCutMultiplexe
         )
     ),
     workingPoints = cms.vstring(
-        "_WPEff98",
-        "_WPEff90",
-        "_WPEff80",
-        "_WPEff70",
-        "_WPEff60"
+        "_WPeff98",
+        "_WPeff90",
+        "_WPeff80",
+        "_WPeff70",
+        "_WPeff60"
     )
 )
 
