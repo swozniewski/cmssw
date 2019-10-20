@@ -373,12 +373,12 @@ void TauDiscriminantCutMultiplexerBase<TauType, TauTypeRef, TauDiscriminatorValu
 }
 
 // compile our desired types and make available to linker
-template class TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseNEW>;
-template class TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseNEW>;
+template class TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseForIDContainers>;
+template class TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseForIDContainers>;
 
 // define our implementations
-typedef TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseNEW> RecoTauDiscriminantCutMultiplexer;
-typedef TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseNEW> PATTauDiscriminantCutMultiplexer;
+typedef TauDiscriminantCutMultiplexerBase<reco::PFTau, reco::PFTauRef, reco::PFSingleTauDiscriminatorContainer, reco::PFTauDiscriminatorContainer, PFTauDiscriminationProducerBaseForIDContainers> RecoTauDiscriminantCutMultiplexer;
+typedef TauDiscriminantCutMultiplexerBase<pat::Tau, pat::TauRef, pat::PATSingleTauDiscriminatorContainer, pat::PATTauDiscriminatorContainer, PATTauDiscriminationProducerBaseForIDContainers> PATTauDiscriminantCutMultiplexer;
 
 DEFINE_FWK_MODULE(RecoTauDiscriminantCutMultiplexer);
 DEFINE_FWK_MODULE(PATTauDiscriminantCutMultiplexer);

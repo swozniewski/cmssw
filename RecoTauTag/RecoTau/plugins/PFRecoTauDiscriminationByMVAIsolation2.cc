@@ -66,10 +66,10 @@ namespace {
   }
 }  // namespace
 
-class PFRecoTauDiscriminationByIsolationMVA2 : public PFTauDiscriminationProducerBaseNEW {
+class PFRecoTauDiscriminationByIsolationMVA2 : public PFTauDiscriminationProducerBaseForIDContainers {
 public:
   explicit PFRecoTauDiscriminationByIsolationMVA2(const edm::ParameterSet& cfg)
-      : PFTauDiscriminationProducerBaseNEW(cfg),
+      : PFTauDiscriminationProducerBaseForIDContainers(cfg),
         moduleLabel_(cfg.getParameter<std::string>("@module_label")),
         mvaReader_(nullptr),
         mvaInput_(nullptr) {
