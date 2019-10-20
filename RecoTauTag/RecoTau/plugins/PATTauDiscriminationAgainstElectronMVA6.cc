@@ -24,10 +24,10 @@
 
 using namespace pat;
 
-class PATTauDiscriminationAgainstElectronMVA6 : public PATTauDiscriminationProducerBaseNEW {
+class PATTauDiscriminationAgainstElectronMVA6 : public PATTauDiscriminationProducerBaseForIDContainers {
 public:
   explicit PATTauDiscriminationAgainstElectronMVA6(const edm::ParameterSet& cfg)
-      : PATTauDiscriminationProducerBaseNEW(cfg), mva_() {
+      : PATTauDiscriminationProducerBaseForIDContainers(cfg), mva_() {
     mva_ = std::make_unique<AntiElectronIDMVA6>(cfg);
 
     srcElectrons = cfg.getParameter<edm::InputTag>("srcElectrons");

@@ -76,10 +76,10 @@ namespace {
 namespace reco {
   namespace tau {
 
-    class PATTauDiscriminationByMVAIsolationRun2 : public PATTauDiscriminationProducerBaseNEW {
+    class PATTauDiscriminationByMVAIsolationRun2 : public PATTauDiscriminationProducerBaseForIDContainers {
     public:
       explicit PATTauDiscriminationByMVAIsolationRun2(const edm::ParameterSet& cfg)
-          : PATTauDiscriminationProducerBaseNEW(cfg),
+          : PATTauDiscriminationProducerBaseForIDContainers(cfg),
             moduleLabel_(cfg.getParameter<std::string>("@module_label")),
             mvaReader_(nullptr),
             mvaInput_(nullptr) {

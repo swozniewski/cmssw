@@ -27,10 +27,10 @@
 
 using namespace reco;
 
-class PFRecoTauDiscriminationAgainstElectronMVA6 : public PFTauDiscriminationProducerBaseNEW {
+class PFRecoTauDiscriminationAgainstElectronMVA6 : public PFTauDiscriminationProducerBaseForIDContainers {
 public:
   explicit PFRecoTauDiscriminationAgainstElectronMVA6(const edm::ParameterSet& cfg)
-      : PFTauDiscriminationProducerBaseNEW(cfg), mva_() {
+      : PFTauDiscriminationProducerBaseForIDContainers(cfg), mva_() {
     mva_ = std::make_unique<AntiElectronIDMVA6>(cfg);
 
     srcGsfElectrons_ = cfg.getParameter<edm::InputTag>("srcGsfElectrons");
