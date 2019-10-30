@@ -880,16 +880,20 @@ class TauIDEmbedder(object):
 
     def processDeepProducer(self, producer_name, tauIDSources, workingPoints_):
         for target,points in six.iteritems(workingPoints_):
-            cuts = self.cms.PSet()
             setattr(tauIDSources, 'by{}VS{}raw'.format(producer_name[0].upper()+producer_name[1:], target),
-                        self.cms.PSet(inputTag = self.cms.InputTag(producer_name, 'VS{}'.format(target)), workingPointIndex = self.cms.int32(-99)))
-            for point,cut in six.iteritems(points):
-                setattr(cuts, point, self.cms.string(str(cut)))
+                        self.cms.PSet(inputTag = self.cms.InputTag(producer_name, 'VS{}'.format(target)), workingPointIndex = self.cms.int32(-1)))
+            
+            cut_expressions = []
+            for index, (point,cut) in enumerate(six.iteritems(points)):
+                cut_expressions.append(str(cut))
 
                 setattr(tauIDSources, 'by{}{}VS{}'.format(point, producer_name[0].upper()+producer_name[1:], target),
                         self.cms.PSet(inputTag = self.cms.InputTag(producer_name, 'VS{}{}'.format(target, point)), workingPointIndex = self.cms.int32(-99)))
+                
+                
+                #cms.PSet(inputTag = self.cms.InputTag(module), workingPointIndex = self.cms.int32(-1 if wp=="raw" else -2 if wp=="category" else getattr(self.process, module).workingPoints.index(wp)))
 
-            setattr(getattr(self.process, producer_name), 'VS{}WP'.format(target), cuts)
+            setattr(getattr(self.process, producer_name), 'VS{}WP'.format(target), self.cms.vstring(*cut_expressions))
 
 
     def getDpfTauVersion(self, file_name):
