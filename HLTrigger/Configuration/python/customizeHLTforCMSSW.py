@@ -46,10 +46,15 @@ def customiseFor2017DtUnpacking(process):
 
     return process
 
+def customizeForTauDiscriminatorDataFormatChanges(process):
+    for producer in producers_by_type(process, "PFTauSelector"):
+        producer.discriminatorContainers = cms.VPSet()
+
 # CMSSW version specific customizations
 def customizeHLTforCMSSW(process, menuType="GRun"):
 
     # add call to action function in proper order: newest last!
     # process = customiseFor12718(process)
+    process = customizeForTauDiscriminatorDataFormatChanges(process)
 
     return process

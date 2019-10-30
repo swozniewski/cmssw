@@ -1,62 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-from RecoTauTag.RecoTau.PFRecoTauDiscriminationByIsolation_cfi import *
 from RecoTauTag.RecoTau.RecoTauDiscriminantCutMultiplexer_cfi import *
-from RecoTauTag.RecoTau.PFRecoTauDiscriminationByMVAIsolation2_cff import *
-
-#chargedIsoPtSum = pfRecoTauDiscriminationByIsolation.clone(
-#    PFTauProducer = cms.InputTag('pfTauProducer'),
-#    ApplyDiscriminationByECALIsolation = cms.bool(False),
-#    ApplyDiscriminationByTrackerIsolation = cms.bool(True),
-#    applyOccupancyCut = cms.bool(False),
-#    applySumPtCut = cms.bool(False),
-#    applyDeltaBetaCorrection = cms.bool(False),
-#    storeRawSumPt = cms.bool(True),
-#    storeRawPUsumPt = cms.bool(False),
-#    customOuterCone = cms.double(0.5),
-#    isoConeSizeForDeltaBeta = cms.double(0.8),
-#    verbosity = cms.int32(0)
-#)
-#neutralIsoPtSum = pfRecoTauDiscriminationByIsolation.clone(
-#    PFTauProducer = cms.InputTag('pfTauProducer'),
-#    ApplyDiscriminationByECALIsolation = cms.bool(True),
-#    ApplyDiscriminationByTrackerIsolation = cms.bool(False),
-#    applyOccupancyCut = cms.bool(False),
-#    applySumPtCut = cms.bool(False),
-#    applyDeltaBetaCorrection = cms.bool(False),
-#    storeRawSumPt = cms.bool(True),
-#    storeRawPUsumPt = cms.bool(False),
-#    customOuterCone = cms.double(0.5),
-#    isoConeSizeForDeltaBeta = cms.double(0.8),
-#    verbosity = cms.int32(0)
-#)
-#puCorrPtSum = pfRecoTauDiscriminationByIsolation.clone(
-#    PFTauProducer = cms.InputTag('pfTauProducer'),
-#    ApplyDiscriminationByECALIsolation = cms.bool(False),
-#    ApplyDiscriminationByTrackerIsolation = cms.bool(False),
-#    applyOccupancyCut = cms.bool(False),
-#    applySumPtCut = cms.bool(False),
-#    applyDeltaBetaCorrection = cms.bool(True),
-#    storeRawSumPt = cms.bool(False),
-#    storeRawPUsumPt = cms.bool(True),
-#    customOuterCone = cms.double(0.5),
-#    isoConeSizeForDeltaBeta = cms.double(0.8),
-#    verbosity = cms.int32(0)
-#)
-
-photonPtSumOutsideSignalCone = chargedIsoPtSum.clone(
-    ApplyDiscriminationByTrackerIsolation = cms.bool(False),
-    storeRawSumPt = cms.bool(False),
-    storeRawPhotonSumPt_outsideSignalCone = cms.bool(True),
-    verbosity = cms.int32(0)
-)
-
-footprintCorrection = chargedIsoPtSum.clone(
-    ApplyDiscriminationByTrackerIsolation = cms.bool(False),
-    storeRawSumPt = cms.bool(False),
-    storeRawFootprintCorrection = cms.bool(True),
-    verbosity = cms.int32(0)
-)
+from RecoTauTag.Configuration.HPSPFTaus_cff import *
 
 discriminationByIsolationMVArun2v1raw = cms.EDProducer("PFRecoTauDiscriminationByMVAIsolationRun2",
 
@@ -107,11 +52,7 @@ discriminationByIsolationMVArun2v1 = recoTauDiscriminantCutMultiplexer.clone(
 )
 
 mvaIsolation2SeqRun2 = cms.Sequence(
-    chargedIsoPtSum
-   + neutralIsoPtSum
-   + puCorrPtSum
-   + photonPtSumOutsideSignalCone
-   + footprintCorrection
+    hpsPFTauBasicDiscriminators
    + discriminationByIsolationMVArun2v1raw
    + discriminationByIsolationMVArun2v1
 )

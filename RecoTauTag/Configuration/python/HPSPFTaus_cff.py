@@ -285,7 +285,7 @@ def getBasicTauDiscriminatorWPIndex(module, IDname, ignore_notfound=False):
     raise Exception
 
 
-## ByLooseMuonRejection3
+## MuonRejection3
 hpsPFTauDiscriminationByMuonRejection3 = pfRecoTauDiscriminationAgainstMuon2.clone(
     PFTauProducer = cms.InputTag('hpsPFTauProducer'),
     Prediscriminants = noPrediscriminants,
@@ -702,6 +702,8 @@ hpsPFTauMVAIsolation2Task = cms.Task(
     )
 
 hpsPFTauMVAIsolation2Seq = cms.Sequence(
+    hpsPFTauBasicDiscriminatorsTask,
+    hpsPFTauBasicDiscriminatorsdR03Task,
     hpsPFTauMVAIsolation2Task
     )
 

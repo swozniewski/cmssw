@@ -33,7 +33,7 @@ HLTTauRefProducer::HLTTauRefProducer(const edm::ParameterSet& iConfig) {
     PFTaus_ = consumes<reco::PFTauCollection>(pfTau.getUntrackedParameter<InputTag>("PFTauProducer"));
     auto discs = pfTau.getUntrackedParameter<vector<InputTag>>("PFTauDiscriminators");
     auto discConts = pfTau.getUntrackedParameter<vector<InputTag>>("PFTauDiscriminatorContainers");
-    auto discContIDx = pfTau.getUntrackedParameter<vector<int>>("PFTauDiscriminatorContainerIndices");
+    PFTauDisContIdx_ = pfTau.getUntrackedParameter<vector<int>>("PFTauDiscriminatorContainerIndices");
     for (edm::InputTag& tag : discs) {
       PFTauDis_.push_back(consumes<reco::PFTauDiscriminator>(tag));
     }
@@ -159,7 +159,7 @@ void HLTTauRefProducer::doPFTaus(edm::Event& iEvent) const {
         for (edm::EDGetTokenT<reco::PFTauDiscriminatorContainer> const& token : PFTauDisCont_) {
           edm::Handle<reco::PFTauDiscriminatorContainer> pftaudis;
           if (iEvent.getByToken(token, pftaudis)) {
-            if (!(*pftaudis)[thePFTau].workingPoints[PFTauDisContIdx_[idx]]) {
+            if ((*pftaudis)[thePFTau].workingPoints.empty() || !(*pftaudis)[thePFTau].workingPoints.at(PFTauDisContIdx_[idx])) { //WP vector not filled if prediscriminor in RecoTauDiscriminator failed.
               passAll = false;
               break;
             }

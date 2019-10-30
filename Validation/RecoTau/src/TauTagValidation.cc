@@ -87,7 +87,7 @@ TauTagValidation::TauTagValidation(const edm::ParameterSet& iConfig)
   std::vector<edm::ParameterSet> temp_plainDiscriminators;
   std::vector<edm::ParameterSet> temp_discriminatorContainers;
   for ( std::vector<edm::ParameterSet>::iterator it = discriminators_.begin();  it != discriminators_.end(); ++it ) {
-    if (it->getParameter<string>("container")==""){
+    if (it->getParameter<string>("container").empty()){
         temp_plainDiscriminators.push_back( *it );
         currentDiscriminatorToken_.push_back(
             consumes<reco::PFTauDiscriminator>(edm::InputTag(it->getParameter<string>("discriminator"))));
@@ -620,7 +620,7 @@ void TauTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& 
             if (currentDiscriminatorContainerToken_[j-currentDiscriminatorToken_.size()].second == -1){
                 passesID = ((*currentDiscriminatorContainer)[thePFTau].rawValues.at(0) >= discriminators_.at(j).getParameter<double>("selectionCut"));
             }else{
-                if((*currentDiscriminatorContainer)[thePFTau].workingPoints.size()==0) passesID = false; //in case of prediscriminant fail at reco level
+                if((*currentDiscriminatorContainer)[thePFTau].workingPoints.empty()) passesID = false; //in case of prediscriminant fail at reco level
                 else passesID = (*currentDiscriminatorContainer)[thePFTau].workingPoints.at(currentDiscriminatorContainerToken_[j-currentDiscriminatorToken_.size()].second);
             }
         }

@@ -608,7 +608,7 @@ float PATTauProducer::getTauIdDiscriminatorFromContainer(const edm::Handle<reco:
       if ((*tauIdDiscr)[tauRef].rawValues.size()==1) return (*tauIdDiscr)[tauRef].rawValues.at(0); //Only 0th component filled with default value if prediscriminor in RecoTauDiscriminator failed.
       return (*tauIdDiscr)[tauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
   }else{
-      if ((*tauIdDiscr)[tauRef].workingPoints.size()==0) return 0.0; //WP vector not filled if prediscriminor in RecoTauDiscriminator failed. Set PAT output to false in this case
+      if ((*tauIdDiscr)[tauRef].workingPoints.empty()) return 0.0; //WP vector not filled if prediscriminor in RecoTauDiscriminator failed. Set PAT output to false in this case
       return (*tauIdDiscr)[tauRef].workingPoints.at(WPIdx);
   }
 }

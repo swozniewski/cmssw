@@ -101,9 +101,10 @@ public:
     TauTransverseImpactParameters_token =
         consumes<PFTauTIPAssociationByRef>(cfg.getParameter<edm::InputTag>("srcTauTransverseImpactParameters"));
 
-    ChargedIsoPtSum_token = consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("srcChargedIsoPtSum"));
-    NeutralIsoPtSum_token = consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("srcNeutralIsoPtSum"));
-    PUcorrPtSum_token = consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("srcPUcorrPtSum"));
+    BasicTauDiscriminators_token = consumes<reco::PFTauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("srcBasicTauDiscriminators"));
+    chargedIsoPtSum_index_ = cfg.getParameter<int>("srcChargedIsoPtSumIndex");
+    neutralIsoPtSum_index_ = cfg.getParameter<int>("srcNeutralIsoPtSumIndex");
+    pucorrPtSum_index_ = cfg.getParameter<int>("srcPUcorrPtSumIndex");
 
     verbosity_ = cfg.getParameter<int>("verbosity");
   }
@@ -139,12 +140,11 @@ private:
   edm::EDGetTokenT<PFTauTIPAssociationByRef> TauTransverseImpactParameters_token;
   edm::Handle<PFTauTIPAssociationByRef> tauLifetimeInfos;
 
-  edm::EDGetTokenT<reco::PFTauDiscriminator> ChargedIsoPtSum_token;
-  edm::Handle<reco::PFTauDiscriminator> chargedIsoPtSums_;
-  edm::EDGetTokenT<reco::PFTauDiscriminator> NeutralIsoPtSum_token;
-  edm::Handle<reco::PFTauDiscriminator> neutralIsoPtSums_;
-  edm::EDGetTokenT<reco::PFTauDiscriminator> PUcorrPtSum_token;
-  edm::Handle<reco::PFTauDiscriminator> puCorrPtSums_;
+  edm::EDGetTokenT<reco::PFTauDiscriminatorContainer> BasicTauDiscriminators_token;
+  edm::Handle<reco::PFTauDiscriminatorContainer> basicTauDiscriminators_;
+  int chargedIsoPtSum_index_;
+  int neutralIsoPtSum_index_;
+  int pucorrPtSum_index_;
 
   edm::Handle<TauCollection> taus_;
 
@@ -164,9 +164,7 @@ void PFRecoTauDiscriminationByIsolationMVA2::beginEvent(const edm::Event& evt, c
 
   evt.getByToken(TauTransverseImpactParameters_token, tauLifetimeInfos);
 
-  evt.getByToken(ChargedIsoPtSum_token, chargedIsoPtSums_);
-  evt.getByToken(NeutralIsoPtSum_token, neutralIsoPtSums_);
-  evt.getByToken(PUcorrPtSum_token, puCorrPtSums_);
+  evt.getByToken(BasicTauDiscriminators_token, basicTauDiscriminators_);
 
   evt.getByToken(Tau_token, taus_);
 }
@@ -186,9 +184,9 @@ reco::PFSingleTauDiscriminatorContainer PFRecoTauDiscriminationByIsolationMVA2::
       ((mvaOpt_ == kNewDMwoLT || mvaOpt_ == kNewDMwLT) &&
        (tauDecayMode == 0 || tauDecayMode == 1 || tauDecayMode == 2 || tauDecayMode == 5 || tauDecayMode == 6 ||
         tauDecayMode == 10))) {
-    double chargedIsoPtSum = (*chargedIsoPtSums_)[tau];
-    double neutralIsoPtSum = (*neutralIsoPtSums_)[tau];
-    double puCorrPtSum = (*puCorrPtSums_)[tau];
+    double chargedIsoPtSum = (*basicTauDiscriminators_)[tau].rawValues.at(chargedIsoPtSum_index_);
+    double neutralIsoPtSum = (*basicTauDiscriminators_)[tau].rawValues.at(neutralIsoPtSum_index_);
+    double puCorrPtSum = (*basicTauDiscriminators_)[tau].rawValues.at(pucorrPtSum_index_);
 
     const reco::PFTauTransverseImpactParameter& tauLifetimeInfo = *(*tauLifetimeInfos)[tau];
 
@@ -248,9 +246,10 @@ void PFRecoTauDiscriminationByIsolationMVA2::fillDescriptions(edm::Configuration
   desc.add<std::string>("mvaOpt");
 
   desc.add<edm::InputTag>("srcTauTransverseImpactParameters");
-  desc.add<edm::InputTag>("srcChargedIsoPtSum");
-  desc.add<edm::InputTag>("srcNeutralIsoPtSum");
-  desc.add<edm::InputTag>("srcPUcorrPtSum");
+  desc.add<edm::InputTag>("srcBasicTauDiscriminators");
+  desc.add<int>("srcChargedIsoPtSumIndex");
+  desc.add<int>("srcNeutralIsoPtSumIndex");
+  desc.add<int>("srcPUcorrPtSumIndex");
   desc.add<int>("verbosity", 0);
 
   fillProducerDescriptions(desc);  // inherited from the base

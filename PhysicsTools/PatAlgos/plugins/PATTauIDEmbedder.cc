@@ -106,10 +106,10 @@ void PATTauIDEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
         int WPIdx = tauIDSrcContainers_[i][j].second;
         if (WPIdx < 0){
           if ((*tauDiscrCont)[inputTauRef].rawValues.size()==1) tauIds[nEmbeddedIDs + j].second = (*tauDiscrCont)[inputTauRef].rawValues.at(0); //Only 0th component filled with default value if prediscriminor in PatTauDiscriminator failed.
-          tauIds[nEmbeddedIDs + j].second = (*tauDiscrCont)[inputTauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
+          else tauIds[nEmbeddedIDs + j].second = (*tauDiscrCont)[inputTauRef].rawValues.at(-1-WPIdx); //uses negative indices to access rawValues. In most cases only one rawValue at WPIdx=-1 exists.
         }else{
-          if ((*tauDiscrCont)[inputTauRef].workingPoints.size()==0) tauIds[nEmbeddedIDs + j].second = 0.0; //WP vector not filled if prediscriminor in PatTauDiscriminator failed. Set PAT output to false in this case
-          tauIds[nEmbeddedIDs + j].second = (*tauDiscrCont)[inputTauRef].workingPoints.at(WPIdx);
+          if ((*tauDiscrCont)[inputTauRef].workingPoints.empty()) tauIds[nEmbeddedIDs + j].second = 0.0; //WP vector not filled if prediscriminor in PatTauDiscriminator failed. Set PAT output to false in this case
+          else tauIds[nEmbeddedIDs + j].second = (*tauDiscrCont)[inputTauRef].workingPoints.at(WPIdx);
         }
       }
       nEmbeddedIDs += tauIDSrcContainers_[i].size();
