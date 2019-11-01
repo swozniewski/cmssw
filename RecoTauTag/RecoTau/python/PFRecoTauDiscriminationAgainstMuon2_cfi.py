@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from RecoTauTag.RecoTau.TauDiscriminatorTools import requireLeadTrack
 
-pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAgainstMuon2",
+pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAgainstMuon2Container",
     
     # tau collection to discriminate
     PFTauProducer = cms.InputTag('pfRecoTauProducer'),

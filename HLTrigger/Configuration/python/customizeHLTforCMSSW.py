@@ -238,8 +238,9 @@ def customiseFor2017DtUnpacking(process):
     return process
 
 def customizeForTauDiscriminatorDataFormatChanges(process):
-    for producer in producers_by_type(process, "PFTauSelector"):
-        producer.discriminatorContainers = cms.VPSet()
+    for x in filters_by_type(process, "PFTauSelector"):
+        x.discriminatorContainers = cms.VPSet()
+    return process
 
 # CMSSW version specific customizations
 def customizeHLTforCMSSW(process, menuType="GRun"):
