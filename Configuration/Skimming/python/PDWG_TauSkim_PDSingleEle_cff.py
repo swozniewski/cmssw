@@ -29,7 +29,7 @@ TauSkimPFTausSelected = cms.EDFilter("PFTauSelector",
       cms.PSet( discriminator=cms.InputTag("hpsPFTauBasicDiscriminators"),
          rawIndices=cms.vint32(),
          selectionCuts=cms.vdouble(),
-         WPIndices=cms.vuint32(0) #ByLooseCombinedIsolationDBSumPtCorr3Hits
+         WPIndices=cms.vint32(0) #ByLooseCombinedIsolationDBSumPtCorr3Hits
       )
    ),
    cut = cms.string('et > 15. && abs(eta) < 2.5') 

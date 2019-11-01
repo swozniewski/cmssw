@@ -10,7 +10,7 @@ TauSkimPFTausSelected = cms.EDFilter("PFTauSelector",
    ),
    discriminatorContainers = cms.VPSet(
       cms.PSet( discriminator=cms.InputTag("hpsPFTauBasicDiscriminators"),
-         rawIndices=cms.vuint32(),
+         rawIndices=cms.vint32(),
          selectionCuts=cms.vdouble(),
          WPIndices=cms.vint32(0) #ByLooseCombinedIsolationDBSumPtCorr3Hits
       )

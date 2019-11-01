@@ -172,21 +172,6 @@ hpsPFTauBasicDiscriminatorsSeq = cms.Sequence(
     hpsPFTauBasicDiscriminatorsTask
 )
 
-### dummy tasks to make these names available. To be removed!!!!!!!
-hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauChargedIsoPtSum=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauNeutralIsoPtSum=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauPUcorrPtSum=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauNeutralIsoPtSumWeight=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauFootprintCorrection=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauPhotonPtSumOutsideSignalCone=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByLoosePileupWeightedIsolation3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByMediumPileupWeightedIsolation3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByTightPileupWeightedIsolation3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByRawPileupWeightedIsolation3Hits=hpsPFTauBasicDiscriminators.clone()
-hpsPFTauDiscriminationByPhotonPtSumOutsideSignalCone=hpsPFTauBasicDiscriminators.clone()
-
 ## Cut based isolations dR=0.3
 hpsPFTauBasicDiscriminatorsdR03 = hpsPFTauBasicDiscriminators.clone(
     deltaBetaFactor = cms.string('0.0720'), # 0.2*(0.3/0.5)^2
