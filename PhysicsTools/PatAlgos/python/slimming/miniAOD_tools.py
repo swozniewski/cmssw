@@ -337,12 +337,9 @@ def miniAOD_customizeCommon(process):
     _makePatTausTaskWithRetrainedMVATauID = process.makePatTausTask.copy()
     _makePatTausTaskWithRetrainedMVATauID.add(process.hpsPFTauBasicDiscriminatorsTask,
                                               process.hpsPFTauDiscriminationByIsolationMVArun2v1DBoldDMwLTTask,
-                                              process.hpsPFTauDiscriminationByIsolationMVArun2v1PWoldDMwLTTask,
                                               process.hpsPFTauDiscriminationByIsolationMVArun2v1DBnewDMwLTTask,
-                                              process.hpsPFTauDiscriminationByIsolationMVArun2v1PWnewDMwLTTask,
                                               process.hpsPFTauBasicDiscriminatorsdR03Task,
                                               process.hpsPFTauDiscriminationByIsolationMVArun2v1DBdR03oldDMwLTTask,
-                                              process.hpsPFTauDiscriminationByIsolationMVArun2v1PWdR03oldDMwLTTask,
                                               process.hpsPFTauDiscriminationByMVA6rawElectronRejection,
                                               process.hpsPFTauDiscriminationByMVA6ElectronRejection,
                                               process.hpsPFTauDiscriminationByMuonRejection3)

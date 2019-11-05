@@ -181,7 +181,7 @@ patTauDiscriminationByIsolationMVArun2v1DBoldDMwLTraw2015 = patDiscriminationByI
    mvaOpt = cms.string("DBoldDMwLT"), # option you want to use for your training (i.e., which variables are used to compute the BDT score)
    verbosity = cms.int32(0)
 )
-# VLoose WP
+# WPs
 patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT2015 = patDiscriminationByIsolationMVArun2v1.clone(
    PATTauProducer = cms.InputTag('slimmedTaus'),
    Prediscriminants = noPrediscriminants,
@@ -354,31 +354,31 @@ slimmedTausUpdated = cms.EDProducer("PATTauIDEmbedder",
 _tauIDSources2017v2 = cms.PSet(
         #oldDM
         byIsolationMVArun2v1DBoldDMwLTraw2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "raw"),
-        byVVLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff95"),
-        byVLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff90"),
-        byLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff80"),
-        byMediumIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff70"),
-        byTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff60"),
-        byVTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff50"),
-        byVVTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_WPEff40"),
+        byVVLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_VVLoose"),
+        byVLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_VLoose"),
+        byLooseIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_Loose"),
+        byMediumIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_Medium"),
+        byTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_Tight"),
+        byVTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_VTight"),
+        byVVTightIsolationMVArun2v1DBoldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT", "_VVTight"),
         #newDM
         byIsolationMVArun2v1DBnewDMwLTraw2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "raw"),
-        byVVLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff95"),
-        byVLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff90"),
-        byLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff80"),
-        byMediumIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff70"),
-        byTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff60"),
-        byVTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff50"),
-        byVVTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_WPEff40"),
+        byVVLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_VVLoose"),
+        byVLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_VLoose"),
+        byLooseIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_Loose"),
+        byMediumIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_Medium"),
+        byTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_Tight"),
+        byVTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_VTight"),
+        byVVTightIsolationMVArun2v1DBnewDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBnewDMwLT", "_VVTight"),
         #oldDMdR0p3
         byIsolationMVArun2v1DBdR03oldDMwLTraw2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "raw"),
-        byVVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff95"),
-        byVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff90"),
-        byLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff80"),
-        byMediumIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff70"),
-        byTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff60"),
-        byVTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff50"),
-        byVVTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_WPEff40")
+        byVVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_VVLoose"),
+        byVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_VLoose"),
+        byLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_Loose"),
+        byMediumIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_Medium"),
+        byTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_Tight"),
+        byVTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_VTight"),
+        byVVTightIsolationMVArun2v1DBdR03oldDMwLT2017v2 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMdR0p3wLT", "_VVTight")
 )
 _tauIDSources2017v1 = cms.PSet(
     byIsolationMVArun2v1DBoldDMwLTraw2017v1 = tauIDMVAinputs("patTauDiscriminationByIsolationMVArun2v1DBoldDMwLT2017v1", "raw"),
@@ -417,11 +417,11 @@ for era in [run2_nanoAOD_94XMiniAODv1,]:
 _antiETauIDSources2018 = cms.PSet(
     againstElectronMVA6Raw2018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "raw"),
     againstElectronMVA6category2018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "category"),
-    againstElectronVLooseMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_WPeff98"),
-    againstElectronLooseMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_WPeff90"),
-    againstElectronMediumMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_WPeff80"),
-    againstElectronTightMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_WPeff70"),
-    againstElectronVTightMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_WPeff60")
+    againstElectronVLooseMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_VLoose"),
+    againstElectronLooseMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_Loose"),
+    againstElectronMediumMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_Medium"),
+    againstElectronTightMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_Tight"),
+    againstElectronVTightMVA62018 = tauIDMVAinputs("patTauDiscriminationByElectronRejectionMVA62018", "_VTight")
 )
 _tauIDSourcesWithAntiE2018 = cms.PSet(
     slimmedTausUpdated.tauIDSources.clone(),
