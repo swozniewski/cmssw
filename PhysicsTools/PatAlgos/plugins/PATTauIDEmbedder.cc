@@ -43,7 +43,7 @@ PATTauIDEmbedder::PATTauIDEmbedder(const edm::ParameterSet& cfg) {
         tauIDSrcs_.push_back(NameTag(*it, tag));
       }else{
         std::map<std::string, IDContainerData>::iterator it2;
-        it2 = idContainerMap.insert(std::pair<std::string, IDContainerData>(tag.label(), IDContainerData(tag, std::vector<NameWPIdx>()))).first;
+        it2 = idContainerMap.insert(std::pair<std::string, IDContainerData>(tag.label()+tag.instance(), IDContainerData(tag, std::vector<NameWPIdx>()))).first;
         it2->second.second.push_back(NameWPIdx(*it, wpidx));
       }
   }
