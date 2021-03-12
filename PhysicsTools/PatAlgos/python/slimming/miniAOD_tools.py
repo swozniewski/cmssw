@@ -393,11 +393,11 @@ def miniAOD_customizeCommon(process):
     if 'newDMPhase2v1' in tauIdEmbedder.toKeep:
         process.rerunDiscriminationByIsolationMVADBnewDMwLTPhase2raw.PATTauProducer=_noUpdatedTauName
         process.rerunDiscriminationByIsolationMVADBnewDMwLTPhase2.PATTauProducer=_noUpdatedTauName
-        task.add(process.rerunIsolationMVADBnewDMwLTPhase2Task)
+        task.add(tauIdEmbedder.rerunIsolationMVADBnewDMwLTPhase2Task)
     if 'againstElePhase2v1' in tauIdEmbedder.toKeep:
         process.patTauDiscriminationByElectronRejectionMVA6Phase2v1Raw.PATTauProducer=_noUpdatedTauName
         process.patTauDiscriminationByElectronRejectionMVA6Phase2v1.PATTauProducer=_noUpdatedTauName
-        task.add(process.patTauDiscriminationByElectronRejectionMVA6Phase2v1Task)
+        task.add(tauIdEmbedder.patTauDiscriminationByElectronRejectionMVA6Phase2v1Task)
 
     #-- Rerun tauID against dead ECal towers to taus for the various re-MiniAOD eras
     # to enable default behoviour with leading track extrapolation to ECAL
